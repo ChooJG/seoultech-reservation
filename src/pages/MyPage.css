@@ -1,0 +1,89 @@
+/* MyPage.css에서 예약 카드와 관련된 부분만 수정 */
+
+.mypage-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #FFF;
+    font-family: 'Arial', sans-serif;
+}
+
+.mypage-container h2 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.reservation-date-group {
+    margin-bottom: 20px;
+}
+
+.reservation-date {
+    padding-left: 2px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: left;
+    color: #000000;
+}
+
+.reservation-card {
+    position: relative;
+    background: #f6f6f6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column; /* 예약 시간을 회의실 이름 아래로 이동 */
+}
+
+.reservation-room {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px; /* 회의실 이름과 시간 사이의 간격 */
+}
+
+.reservation-time {
+    font-size: 14px;
+    color: #AAAAAA;
+}
+
+.reservation-cancel-button {
+    background-color: #F7F7F7;
+    color: #AAAAAA;
+    border: none;
+    cursor: pointer;
+    align-self: flex-end; /* 버튼을 카드의 오른쪽 상단에 위치시키기 */
+    margin-top: 10px; /* 버튼이 예약 시간과 너무 가깝지 않도록 간격 추가 */
+}
+
+.reservation-confirmation {
+    position: absolute;
+    width: 30px; 
+    height: auto; 
+    display: inline-block; 
+    top: 15px;
+    right: 10px;
+}
+
+.reservation-card.past {
+    background-color: #E8E8E8; /* 어두운 배경색 설정 */
+    /* 추가적으로 텍스트 색상을 변경해야 할 수도 있습니다. */
+    color: #AAAAAA;
+}
+
+.reservation-card .reservation-room.past,
+.reservation-card .reservation-time.past {
+    /* 지나간 예약에 대한 room과 time 스타일 */
+    color: #AAAAAA; /* 글자색을 변경 */
+}
+
+.reservation-action-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+.reservation-card .reservation-time.upcoming {
+    /* 아직 도래하지 않은 예약에 대한 room과 time 스타일 */
+    color: #4195ff; /* 글자색을 검정색으로 변경 */
+    position: relative;
+}

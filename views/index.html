@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>로그인 되었습니다!</h1>
+<h3>userid : {{ user.userid }}</h3>
+<h3>username : {{ user.nick }}</h3>
+
+<form action="/auth/selectRoom" method="get">
+  <input type="hidden" name="roomName" value="세미나실">
+  <input type="hidden" name="roomValue" value="seminar">
+  <input type="submit" value="세미나실">
+</form>
+
+<form action="/auth/selectRoom" method="get">
+  <input type="hidden" name="roomName" value="소회의실1">
+  <input type="hidden" name="roomValue" value="meetRoom1">
+  <input type="submit" value="소회의실1">
+</form>
+
+<form action="/auth/selectRoom" method="get">
+  <input type="hidden" name="roomName" value="소회의실2">
+  <input type="hidden" name="roomValue" value="meetRoom2">
+  <input type="submit" value="소회의실2">
+</form>
+
+
+<a id="logout" href="/auth/logout" class="btn">로그아웃</a>
+
+</body>
+</html>
+
+{% block script %}
+<script>
+  window.onload = () => {
+    if (new URL(location.href).searchParams.get('error')) {
+      alert('이미 존재하는 예약입니다.');
+    }
+    else if (new URL(location.href).searchParams.get('success')) {
+      alert('예약이 완료되었습니다.');
+    }
+  };
+
+</script>
+{% endblock %}

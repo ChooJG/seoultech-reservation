@@ -1,0 +1,48 @@
+/* List.css */
+.list-container {
+    padding: 20px;
+    max-width: 600px; /* 최대 너비 설정 */
+    margin: 0 auto; /* 상하 마진은 0, 좌우 마진은 자동으로 설정하여 중앙 정렬 */
+    background-color: #ffffff; /* 배경색 설정 */
+}
+
+.meeting-rooms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(346px, 1fr)); /* 그리드 레이아웃을 사용하여 반응형으로 만듭니다. */
+    gap: 20px; /* 회의실 카드 간격 */
+}
+
+.meeting-room {
+    position: relative;
+    height: 150px; /* 카드의 높이 */
+    overflow: hidden; /* 이미지가 border-radius를 따르도록 함 */
+    border-radius: 10px; /* 카드 모서리 둥글게 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 카드에 그림자 효과 */
+}
+
+.room-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지가 컨테이너를 꽉 채우도록 함 */
+}
+
+.room-name {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white; /* 텍스트 색상 */
+    font-size: 1.0rem; /* 텍스트 크기 */
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.5); /* 텍스트 위의 어두운 오버레이 */
+    transition: background-color 0.3s; /* 마우스 오버 효과를 위한 전환 */
+}
+
+/* 마우스 오버시 오버레이 효과 강화 */
+.meeting-room:hover .room-name {
+    background: rgba(0, 0, 0, 0.7);
+}

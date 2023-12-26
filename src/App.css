@@ -1,0 +1,80 @@
+/* App.css */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  padding-top: 30%;
+  font-family: 'Arial, sans-serif';
+  width: 100%;
+  max-width: 600px;
+}
+
+.logo-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* App.css */
+.center-text {
+  text-align: center;
+  color: grey;
+  margin-top: 10px; /* 간격을 줄이고 싶으면 이 값을 줄이세요. */
+  margin-bottom: 1px; /* 간격을 줄이고 싶으면 이 값을 줄이세요. */
+}
+
+.center-text:first-of-type {
+  margin-bottom: 0; /* 첫 번째 요소의 아래쪽 마진을 제거합니다. */
+}
+
+.center-text:last-of-type {
+  margin-top: 0; /* 마지막 요소의 위쪽 마진을 제거합니다. */
+}
+
+
+
+.input-container {
+  width: 90%;
+  max-width: 600px;
+  margin-bottom: 15px;
+}
+
+.login-button {
+  width: 90%;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* This ensures padding is included in width */
+  height: 40px;
+}
+
+.label {
+  text-align: left;
+  width: 100%;
+  margin-bottom: 10px;
+  color: #767676;
+}
+
+/* 플레이스홀더 색상 설정 */
+.input-field::placeholder {
+  color: #B6B6B6; /* 플레이스홀더 텍스트 색상을 밝은 회색으로 설정 */
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #EFEFEF;
+  border-radius: 4px;
+  box-sizing: border-box; /* This ensures padding is included in width */
+  background-color: #FBFBFB;
+  margin-top: 4px;
+}
+
+.login-button {
+  background-color: #1e90ff;
+  color: white;
+  border: none;
+  margin-top: 15px; /* Adjust as needed */
+  cursor: pointer;
+}

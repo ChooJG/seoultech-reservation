@@ -1,0 +1,79 @@
+{% block content %}
+
+<h1>일정 선택</h1>
+<h3>{{ roomName }}</h3>
+<h3>userid : {{ user.userid }}</h3>
+<div>
+    <form action="/auth/selectTime" method="post">
+        <label for="date">날짜 선택:</label><br>
+        <input type="date" id="date" name="date" required><br>
+        <label for="time">시간 선택:</label><br>
+        <input type="time" id="time" name="time" step="3600" required>
+
+        <input type="hidden" name="user" value="{{ user }}">
+        <input type="hidden" name="roomValue" value="{{ roomValue }}">
+
+        <input type="submit" value="제출">
+    </form>
+</div>
+<div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();
+
+            today = yyyy + '-' + mm + '-' + dd;
+            document.getElementById("resDate").value = today;
+        });
+    </script>
+    <label>현재 예약 현황</label>
+    <label for="resDate">날짜 선택:</label><br>
+    <input type="date" id="resDate" name="resDate"><br>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+        </tr>
+    </table>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+<script>
+    window.onload = () => {
+        if (new URL(location.href).searchParams.get('error')) {
+            alert('이미 존재하는 예약입니다.');
+        }
+    };
+
+
+    $('#resDate').on('change', function() {
+        var selectedDate = $(this).val();
+
+        $.ajax({
+            url: '/auth/resDate',
+            type: 'GET',
+            data: { date: selectedDate,
+                    roomValue: "{{ roomValue }}",
+            },
+            success: function(res) {
+                $('table tr:not(:first)').remove();
+
+                if (res === '') {
+                    return;
+                }
+
+                res.forEach(function(reservation) {
+                    var row = '<tr><td>' +
+                        reservation.date + '</td><td>' +
+                        reservation.time + '</td></tr>';
+                    $('table').append(row);
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
