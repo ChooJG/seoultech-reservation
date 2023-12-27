@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Modal from '../components/Modal';
 import './Reservation.css';
+import axios from "axios";
 
 function Reservation() {
   const { roomId } = useParams();
@@ -24,6 +25,12 @@ function Reservation() {
   const [startTime, setStartTime] = useState(times[0]);
   const [endTime, setEndTime] = useState(times[1]);
   const [showModal, setShowModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(availableDates[0] || '');
+
+
+  const handleDateChange = (e) => {
+    setSelectedDate(e.target.value);
+  };
 
   const handleStartTimeChange = (e) => {
     setStartTime(e.target.value);
@@ -35,26 +42,64 @@ function Reservation() {
     setShowModal(false);
   };
 
-  const validateTimes = () => {
+  const validateTimes = async () => {
+    const date = new Date(selectedDate);
     const start = new Date(`2023-01-01T${startTime}`);
     const end = new Date(`2023-01-01T${endTime}`);
     if (start >= end) {
       setShowModal(true);
     } else {
-      // Submit the form or do the next steps
+      const formatTime = (date) => {
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+      };
+
+      const startTime = formatTime(start);
+      const endTime = formatTime(end);
+      const resDate = formatDate(date)
+
+      console.log(start)
+      console.log(endTime)
+      console.log(roomName);
+      console.log(resDate);
+
+      try {
+        const response =
+            await axios.post('http://localhost:3001/auth/selectTime',
+            { startTime, endTime, roomName, resDate },
+            { withCredentials: true });
+
+        const isSuccess = response.data.success
+        if (isSuccess){
+          alert("예약되었습니다.")
+        }
+        else{
+          alert("이미 존재하는 예약입니다.");
+        }
+      }
+      catch (error){
+        console.error('로그인 요청에서 에러가 발생했습니다', error);
+        alert('오류가 발생하였습니다. 잠시 후에 다시 시도해주세요.');
+      }
+
+
+
+
+
     }
   };
 
   return (
-    <div className="reservation-form">
-      <h3>{roomName}</h3>
+      <div className="reservation-form">
+        <h3>{roomName}</h3>
 
-      <label htmlFor="reservationDate" className="label">예약 날짜</label>
-      <select id="reservationDate">
-        {availableDates.map((date) => (
-          <option key={date} value={date}>{date}</option>
-        ))}
-      </select>
+        <label htmlFor="reservationDate" className="label">예약 날짜</label>
+        <select id="reservationDate" value={selectedDate} onChange={handleDateChange}>
+          {availableDates.map((date) => (
+              <option key={date} value={date}>{date}</option>
+          ))}
+        </select>
 
       <label htmlFor="startTime" className="label">예약 시작 시간</label>
       <select id="startTime" value={startTime} onChange={handleStartTimeChange}>
@@ -101,6 +146,14 @@ function generateDates() {
     dates.push(date.toISOString().split('T')[0]);
   }
   return dates;
+}
+
+function formatDate(dateObject) {
+  const year = dateObject.getFullYear();
+  const month = (dateObject.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 1을 더함
+  const day = dateObject.getDate().toString().padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 }
 
 export default Reservation;

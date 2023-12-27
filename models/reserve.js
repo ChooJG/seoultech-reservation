@@ -8,11 +8,16 @@ class Reserve extends Sequelize.Model{
                 allowNull: false,
             },
             date: {
+                type: Sequelize.STRING(20),
+                allowNull: false,
+                unique: false,
+            },
+            startTime: {
                 type: Sequelize.STRING(10),
                 allowNull: false,
                 unique: false,
             },
-            time: {
+            endTime: {
                 type: Sequelize.STRING(10),
                 allowNull: false,
                 unique: false,
