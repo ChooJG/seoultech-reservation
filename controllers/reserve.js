@@ -25,38 +25,55 @@ exports.selectRoom = async (req, res, next) => {
 
 //시간대 선택 후 겹치는거 없으면 예약 진행
 exports.selectTime = async (req, res, next) => {
-    const date = req.body.date;
-    const time = req.body.time;
-    const userId = req.body.userId;
-    const room = req.body.roomValue;
+    const date = req.body.resDate;
+    const startTime = req.body.startTime;
+    const endTime = req.body.endTime;
+    const userId = req.session.userInfo.userid;
+    const roomName = req.body.roomName;
+    let roomValue = '';
+
+    switch (roomName){
+        case '세미나실':
+            roomValue = 'seminar';
+            break;
+        case '소회의실1':
+            roomValue = 'meetRoom1';
+            break;
+        case '소회의실2':
+            roomValue = 'meetRoom2';
+            break;
+    }
 
     console.log("==================================")
     console.log("date : ", date)
-    console.log("time : ", time)
+    console.log("startTime : ", startTime)
+    console.log("endTime : ", endTime)
     console.log("userid : ", userId)
-    console.log("roomValue : ", room)
+    console.log("roomValue : ", roomValue)
 
     try{
         const exRes = await Reserve.findOne(({ where: {
                 date,
-                time,
-                room,
+                startTime,
+                endTime,
+                roomValue,
             } } ));
         if(exRes){
-            return res.redirect('/?error=exist');
+            res.json({ success: false, message: '예약이 이미 존재합니다.' });
         }
 
         await Reserve.create({
-            room,
+            roomValue,
             date,
-            time,
+            startTime,
+            endTime,
             userId,
         });
-        res.redirect('/?success=true');
+        res.json({ success: true, message: '예약이 성공적으로 완료되었습니다.' });
     }
     catch (error){
         console.log(error);
-        return next(error);
+        res.status(500).json({ success: false, message: '서버에서 오류가 발생했습니다.' });
     }
 }
 

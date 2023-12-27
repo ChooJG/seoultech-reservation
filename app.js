@@ -33,6 +33,12 @@ sequelize.sync({ force: false })
       console.error(err);
     });
 
+var cors = require('cors');
+app.use(cors({
+  origin: 'http://localhost:3000', // 클라이언트의 주소
+  credentials: true
+}));
+
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
