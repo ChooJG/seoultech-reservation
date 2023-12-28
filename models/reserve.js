@@ -3,16 +3,21 @@ const Sequelize = require('sequelize');
 class Reserve extends Sequelize.Model{
     static initiate(sequelize){
         Reserve.init({
-            room: {
+            roomValue: {
                 type: Sequelize.ENUM('seminar', 'meetRoom1', 'meetRoom2'),
                 allowNull: false,
             },
             date: {
+                type: Sequelize.STRING(20),
+                allowNull: false,
+                unique: false,
+            },
+            startTime: {
                 type: Sequelize.STRING(10),
                 allowNull: false,
                 unique: false,
             },
-            time: {
+            endTime: {
                 type: Sequelize.STRING(10),
                 allowNull: false,
                 unique: false,
