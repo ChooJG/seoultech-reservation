@@ -6,34 +6,38 @@ import Reservation from './pages/reservation';
 import List from './pages/list'
 import MyPage from './pages/mypage';
 import Header from './components/Header';
+import { AuthContextProvider } from './AuthContext';
 
 function App() {
-  return (
-    <BrowserRouter>
-      <MainLayout />
-    </BrowserRouter>
-  );
+
+    return (
+        <BrowserRouter>
+            <AuthContextProvider> {/* AuthContextProvider 추가 */}
+                <MainLayout />
+            </AuthContextProvider>
+        </BrowserRouter>
+    );
 }
 
 function MainLayout() {
-  return (
-    <>
-      <ConditionalHeader />
-      <Routes>
-        <Route path='/login' element={<Login />} />
-        <Route path='/list' element={<List />} />
-        <Route path="/reservation/:roomId" element={<Reservation />} />
-        <Route path='/mypage' element={<MyPage />} />
-      </Routes>
-    </>
-  );
+    return (
+        <>
+            <ConditionalHeader />
+            <Routes>
+                <Route path='/login' element={<Login />} />
+                <Route path='/list' element={<List />} />
+                <Route path="/reservation/:roomId" element={<Reservation />} />
+                <Route path='/mypage' element={<MyPage />} />
+            </Routes>
+        </>
+    );
 }
 
 function ConditionalHeader() {
-  let location = useLocation();
+    let location = useLocation();
 
-  // 로그인 페이지가 아닐 때만 Header 컴포넌트를 렌더링합니다.
-  return location.pathname !== '/login' ? <Header /> : null;
+    // 로그인 페이지가 아닐 때만 Header 컴포넌트를 렌더링합니다.
+    return location.pathname !== '/login' ? <Header /> : null;
 }
 
 export default App;

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 
 function Login(){
-    const [id, setId] = useState('');
-    const [pw, setPw] = useState('');
+    const [userid, setId] = useState('');
+    const [password, setPw] = useState('');
     const navigate = useNavigate();
+
 
     const onChangeHandleId = (event) => {
         setId(event.target.value);
@@ -14,28 +16,30 @@ function Login(){
         setPw(event.target.value);
     };
 
-    const onLogin = async () => {
+    const onLogin = async (event) => {
+        event.preventDefault();
         try {
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id, pw }),
-            });
+            const response =
+                await axios.post('http://localhost:3001/auth/login',
+                    { userid, password },
+                    { withCredentials: true });
+            console.log("클라이언트 onlogin")
+            const isSuccess = response.data.success
 
-            if (response.ok) {
+            if (isSuccess) {
+                console.log(isSuccess);
                 navigate('/list');
             } else {
-                const { message } = await response.json();
-                alert(message);
+                console.error(response.data.message);
+                alert('아이디 또는 비밀번호가 잘못되었습니다.')
             }
-        } catch (err) {
-            console.error('로그인 처리 중 에러 발생:', err);
+        } catch (error) {
+            console.error('로그인 요청에서 에러가 발생했습니다', error);
+            alert('오류가 발생하였습니다. 잠시 후에 다시 시도해주세요.');
         }
     };
 
-    console.log(id, pw);
+    console.log(userid, password);
 
     return(
         <div className="container">
@@ -50,7 +54,7 @@ function Login(){
                     id="id"
                     type="text"
                     placeholder="아이디를 입력해주세요"
-                    value={id}
+                    value={userid}
                     onChange={onChangeHandleId}
                     className="input-field"
                 />
@@ -61,7 +65,7 @@ function Login(){
                     id="pw"
                     type="password"
                     placeholder="비밀번호를 입력해주세요"
-                    value={pw}
+                    value={password}
                     onChange={onChangeHandlePw}
                     className="input-field"
                 />

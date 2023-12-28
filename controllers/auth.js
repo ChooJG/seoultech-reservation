@@ -27,23 +27,32 @@ exports.join = async (req, res, next) => {
 
 
 exports.login = (req, res, next) => {
+    console.log("로그인중....")
+    console.log("세션 ID:", req.sessionID);
     passport.authenticate('local', (authError, user, info) => {
         if (authError){
             console.error(authError);
-            return next(authError);
+            return res.status(500).json({error: authError});
         }
         if (!user){
-            return res.redirect(`/?loginError=${info.message}`);
+            return res.status(401).json({error: 'Login failed', message: info.message});
         }
         return req.login(user, (loginError) => {
             if (loginError){
                 console.error(loginError);
-                return next(loginError);
+                return res.status(500).json({error: loginError});
             }
-            return res.redirect('/');
+            req.session.userInfo = {
+                role: user.role,
+                userid: user.userid,
+            };
+            console.log("================");
+            console.log("user : ", req.session.userInfo);
+            return res.status(200).json({success: true, message: 'Login successful'});
         });
     })(req, res, next);
 };
+
 
 
 exports.logout = (req, res) => {
@@ -51,3 +60,21 @@ exports.logout = (req, res) => {
         res.redirect('/');
     });
 };
+
+
+exports.isLogin = (req, res)=> {
+    console.log("=================");
+    console.log("로그인함?", req.session.userInfo);
+    if (req.session && (req.session.userInfo || req.user)) {
+        res.json({
+            isAuthenticated: true,
+            userinfo: req.session.userInfo,
+            userid: req.session.userInfo.userid, // 사용자 정보 반환
+            role: req.session.userInfo.role,
+        });
+    } else {
+        res.json({
+            isAuthenticated: false,
+        });
+    }
+}
