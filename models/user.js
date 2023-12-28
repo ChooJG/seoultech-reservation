@@ -8,23 +8,8 @@ class User extends Sequelize.Model{
                 allowNull: false, //null허용 안함
                 unique: true, //unique해야 함
             },
-            nick: {
-                type: Sequelize.STRING(20),
-                allowNull: false,
-                unique: false,
-            },
             password: {
                 type: Sequelize.STRING(70),
-                allowNull: false,
-                unique: false,
-            },
-            email: {
-                type: Sequelize.STRING(20),
-                allowNull: false,
-                unique: false,
-            },
-            tel: {
-                type: Sequelize.STRING(20),
                 allowNull: false,
                 unique: false,
             },

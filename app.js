@@ -12,6 +12,7 @@ const passport = require('passport');
 dotenv.config();
 const pageRouter = require('./routes/page');
 const authRouter = require('./routes/auth');
+const adminRouter = require('./routes/admin');
 const { sequelize } = require('./models');
 const passportConfig = require('./passport');
 
@@ -33,6 +34,12 @@ sequelize.sync({ force: false })
       console.error(err);
     });
 
+var cors = require('cors');
+app.use(cors({
+  origin: 'http://localhost:3000', // 클라이언트의 주소
+  credentials: true
+}));
+
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
@@ -45,6 +52,7 @@ app.use(session({
   cookie: {
     httpOnly: true,
     secure: false,
+    maxAge: 60 * 60 * 1000,  // 1 hour
   },
 }));
 app.use(passport.initialize());
@@ -54,6 +62,7 @@ app.use(passport.session());
 
 app.use('/', pageRouter);
 app.use('/auth', authRouter);
+app.use('/admin', adminRouter);
 
 
 app.use((req, res, next)=> {
