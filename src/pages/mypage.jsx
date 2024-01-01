@@ -22,7 +22,7 @@ function MyPage() {
                 }
             })
             .catch(error => {
-                console.error('로그인 상태 확인 중 오류 발생:', error);
+                //console.error('로그인 상태 확인 중 오류 발생:', error);
                 navigate('/');
             });
     }, [navigate]);
@@ -44,7 +44,7 @@ function MyPage() {
                 setReservations(sortedReservations);
             })
             .catch(error => {
-                console.error('There was an error!', error);
+                //console.error('There was an error!', error);
             });
     };
 
@@ -79,16 +79,21 @@ function MyPage() {
     }, {});
 
     const isReservationPast = (date, time) => {
+        const formattedDate = date.slice(0, 12).replace(/\. /g, '-');
+        const parts = time.split(' (');
+        const formattedtime = parts[0];
+
+
         const now = moment().tz('Asia/Seoul');  // 현재 시간 (KST)
-        const reservationDateTime = moment.tz(`${date} ${time.split(' - ')[1]}`, 'Asia/Seoul');  // 예약 시간 (KST)
+        const reservationDateTime = moment.tz(`${formattedDate} ${formattedtime.split(' - ')[1]}`, 'Asia/Seoul');  // 예약 시간 (KST)
         return now >= reservationDateTime;
     };
 
 
     //예약 취소 버튼
     async function handleButtonClick (event, reservation) {
-        console.log(event.target);  // 클릭된 버튼의 정보
-        console.log(reservation.id);   // 예약 정보
+        //console.log(event.target);  // 클릭된 버튼의 정보
+        //console.log(reservation.id);   // 예약 정보
 
         try {
             // 서버에 예약 취소 요청을 보냅니다.
@@ -97,47 +102,15 @@ function MyPage() {
                 { id: reservation.id },
                 { withCredentials: true });
 
-            console.log(response.data);
+            //console.log(response.data);
             if(response.data){
                 fetchReservations();
             }
         } catch (error) {
-            console.error(`Error: ${error}`);  // 요청이 실패하면 콘솔에 에러 메시지를 출력합니다.
+            //console.error(`Error: ${error}`);  // 요청이 실패하면 콘솔에 에러 메시지를 출력합니다.
         }
 
     }
-
-    // async function handleButtonClick (event, reservation) {
-    //     console.log(event.target);  // 클릭된 버튼의 정보
-    //     console.log(reservation.id);   // 예약 정보
-    //
-    //     try {
-    //         // 서버에 파일 다운로드 요청을 보냅니다.
-    //         const response = await axios({
-    //             url: 'http://localhost:3001/admin/infoDown',
-    //             method: 'POST',
-    //             data: { id: reservation.id },
-    //             withCredentials: true,
-    //             responseType: 'blob', // important
-    //         });
-    //
-    //         // 서버로부터 받은 파일을 다운로드 합니다.
-    //         const url = window.URL.createObjectURL(new Blob([response.data]));
-    //         const link = document.createElement('a');
-    //
-    //         const csv_name = reservation.id + '_reservations.csv';
-    //
-    //         link.href = url;
-    //         link.setAttribute('download', csv_name); // 다운로드 받을 파일의 이름입니다.
-    //         document.body.appendChild(link);
-    //         link.click();
-    //
-    //         fetchReservations();
-    //     } catch (error) {
-    //         console.error(`Error: ${error}`);  // 요청이 실패하면 콘솔에 에러 메시지를 출력합니다.
-    //     }
-    // }
-
 
 
     return (

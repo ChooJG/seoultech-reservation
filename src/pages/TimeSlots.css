@@ -1,14 +1,45 @@
+/*!* TimeSlots.css 수정 부분 *!*/
+/*.time-slots-container {*/
+/*    display: flex; !* 가로로 나열하기 위해 flexbox 사용 *!*/
+/*    flex-wrap: nowrap; !* 한 줄로 표시 *!*/
+/*    justify-content: flex-start; !* 왼쪽에서 시작 *!*/
+/*    align-items: center; !* 세로 중앙 정렬 *!*/
+/*    width: 95%; !* 컨테이너의 너비를 600px로 설정 *!*/
+/*    margin-bottom: 20px; !* 아래쪽 여백 *!*/
+/*  }*/
+/*  */
+/*  .time-slot {*/
+/*    flex-grow: 1; !* 가용 공간을 균등하게 나누어 사용 *!*/
+/*    height: 10px; !* 타임슬롯 높이 *!*/
+/*    background-color: #ECECEC; !* 기본 배경색 *!*/
+/*    border: 1px solid #FFFFFF; !* 테두리 *!*/
+/*    margin: 0 -1px; !* 박스들이 서로 붙게 *!*/
+/*    position: relative; !* 레이블 위치 조정을 위해 *!*/
+/*    cursor: pointer; !* 클릭 가능한 항목 표시 *!*/
+/*  }*/
+/*  */
+/*  .time-slot.selected {*/
+/*    background-color: #4195FF; !* 선택된 시간대 배경색을 파란색으로 설정 *!*/
+/*    color: white; !* 선택된 시간대 텍스트 색상을 흰색으로 설정 *!*/
+/*  }*/
+
+/*    .time-slot.reserved {*/
+/*    background-color: #BBBBBB;*/
+/*    color: white;*/
+/*  }*/
+/**/
+
 /* TimeSlots.css 수정 부분 */
 .time-slots-container {
     display: flex; /* 가로로 나열하기 위해 flexbox 사용 */
     flex-wrap: nowrap; /* 한 줄로 표시 */
     justify-content: flex-start; /* 왼쪽에서 시작 */
     align-items: center; /* 세로 중앙 정렬 */
-    width: 95%; /* 컨테이너의 너비를 600px로 설정 */
+    width: 100%; /* 컨테이너의 너비를 600px로 설정 */
     margin-bottom: 20px; /* 아래쪽 여백 */
-  }
-  
-  .time-slot {
+}
+
+.time-slot {
     flex-grow: 1; /* 가용 공간을 균등하게 나누어 사용 */
     height: 10px; /* 타임슬롯 높이 */
     background-color: #ECECEC; /* 기본 배경색 */
@@ -16,15 +47,14 @@
     margin: 0 -1px; /* 박스들이 서로 붙게 */
     position: relative; /* 레이블 위치 조정을 위해 */
     cursor: pointer; /* 클릭 가능한 항목 표시 */
-  }
-  
-  .time-slot.selected {
+}
+
+.time-slot.selected {
     background-color: #4195FF; /* 선택된 시간대 배경색을 파란색으로 설정 */
     color: white; /* 선택된 시간대 텍스트 색상을 흰색으로 설정 */
-  }
+}
 
-    .time-slot.reserved {
+.time-slot.reserved {
     background-color: #BBBBBB;
     color: white;
-  }
-  
+}

@@ -1,5 +1,6 @@
 const Reserve = require('../models/reserve');
 const User = require("../models/user");
+const Booked = require('../models/booked');
 const moment = require('moment');
 require('moment-timezone');
 
@@ -42,9 +43,6 @@ exports.selectTime = async (req, res, next) => {
             break;
     }
 
-    console.log("=================");
-    console.log("세션 유저 아이디 : ", req.session.userInfo.userid);
-    console.log("유저 아이디 :", req.user.userid)
     try{
         if (!req.user) {
             res.status(401).send('로그인이 필요합니다.');
@@ -91,13 +89,24 @@ exports.selectTime = async (req, res, next) => {
             return res.json({ success: false, message: "예약이 이미 존재합니다." });
         }
 
-        await Reserve.create({
+        const newReserve = await Reserve.create({
             roomValue,
             date,
             startTime,
             endTime,
             UserId,
         });
+        // 생성된 레코드의 ID를 얻습니다.
+        const ReserveId = newReserve.id;
+        await Booked.create({
+            nick: req.user.userid,
+            roomValue,
+            date,
+            startTime,
+            endTime,
+            UserId,
+            ReserveId,
+        })
         res.json({ success: true, message: '예약이 성공적으로 완료되었습니다.' });
     }
     catch (error){
@@ -199,9 +208,6 @@ exports.getUserRes = async (req, res) => {
             };
         });
 
-        console.log("ddddddddddddddddddddddddddddd")
-        console.log(userResArr)
-
         if (formatResArr.length === 0) {
             res.send('');
         } else {
@@ -230,9 +236,9 @@ function roomnames(room){
     switch (room){
         case 'seminar':
             return '세미나실';
-        case 'meetroom1':
+        case 'meetRoom1':
             return '소회의실1';
-        case 'meetroom2':
+        case 'meetRoom2':
             return '소회의실2';
     }
     return '';
@@ -254,6 +260,7 @@ function formatTimeRange(startTime, endTime) {
     return `${startTime} - ${endTime} (${hours}시간 ${minutes}분)`;
 }
 
+//예약 내역 삭제
 exports.deleteRes = async (req, res) => {
     if(!req.user){
         return res.status(401).send('로그인이 필요합니다.');
@@ -280,6 +287,10 @@ exports.deleteRes = async (req, res) => {
                 id: resId
             }
         });
+        await Booked.update(
+            { cancel: 'cancel' },  // 변경할 속성
+            { where: { ReserveId: resId } }  // 수정할 레코드를 찾는 조건
+        );
 
         res.status(200).json({ message: true });
     } catch (error) {

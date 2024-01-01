@@ -6,7 +6,6 @@ class User extends Sequelize.Model{
             userid: {
                 type: Sequelize.STRING(20),
                 allowNull: false, //null허용 안함
-                unique: true, //unique해야 함
             },
             password: {
                 type: Sequelize.STRING(70),

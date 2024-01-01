@@ -1,10 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Header.css'; // 닫기 버튼 스타일을 포함한 스타일시트 업데이트 필요
+import axios from "axios";
 
 function Header() {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    const handleLogin = () => {
+        axios.get('http://localhost:3001/auth/isLogin',
+            { withCredentials: true })
+            .then(response => {
+                const role = response.data.role;
+                if(role == 'admin'){
+                    const isAdmin = true;
+                    setIsAdmin(isAdmin);
+                }
+            })
+            .catch(error => {
+                console.error('Login error:', error);
+            });
+    };
 
     const redirectToHome = () => {
         navigate('/list'); // 클릭 시 /list 경로로 이동
@@ -12,6 +30,7 @@ function Header() {
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen); // 메뉴 상태 토글
+        handleLogin();
     };
 
     const navigateTo = (path) => {
@@ -37,6 +56,7 @@ function Header() {
                     <ul>
                         <li onClick={() => navigateTo('/list')}>회의실 예약</li>
                         <li onClick={() => navigateTo('/mypage')}>나의 예약현황</li>
+                        {isAdmin && <li onClick={() => navigateTo('/admin')}>관리자 페이지</li>}
                         <li onClick={() => navigateTo('/')}>로그아웃</li>
                     </ul>
                 </nav>

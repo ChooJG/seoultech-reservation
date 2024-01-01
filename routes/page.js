@@ -11,14 +11,14 @@ router.use((req, res, next) => {
 
 //router.get('/profile', isLoggedIn, renderProfile);
 
-router.get('/join', isNotLoggedIn ,renderJoin);
+//router.get('/join', isNotLoggedIn ,renderJoin);
 
-router.get('/', (req, res, next) => {
-    if (req.isAuthenticated()) { // 로그인 상태 확인
-        return renderIndex(req, res, next); // 로그인한 경우
-    }
-    return renderMain(req, res, next); // 로그인하지 않은 경우
-});
+// router.get('/', (req, res, next) => {
+//     if (req.isAuthenticated()) { // 로그인 상태 확인
+//         return renderIndex(req, res, next); // 로그인한 경우
+//     }
+//     return renderMain(req, res, next); // 로그인하지 않은 경우
+// });
 
 
 module.exports = router;

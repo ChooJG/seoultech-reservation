@@ -35,7 +35,7 @@ function Reservation() {
           }
         })
         .catch(error => {
-          console.error('로그인 상태 확인 중 오류 발생:', error);
+          //console.error('로그인 상태 확인 중 오류 발생:', error);
           navigate(`/`);
         });
   }, [navigate, roomId]); // id가 변경될 때마다 로그인 상태를 재확인합니다
@@ -57,7 +57,7 @@ function Reservation() {
           setReservedSlots(initialReservedTimes);
         })
         .catch(error => {
-          console.error('Error while sending date to server:', error);
+          //console.error('Error while sending date to server:', error);
         });
   }, []);
 
@@ -77,7 +77,7 @@ function Reservation() {
 
     setSelectedDate(e.target.value);
     const nowResDate = e.target.value;
-    console.log(e.target.value)
+    //console.log(e.target.value)
 
     axios.post('http://localhost:3001/auth/resDate',
         {
@@ -90,9 +90,25 @@ function Reservation() {
           setReservedSlots(reservedTimes);
         })
         .catch(error => {
-          console.error('Error while sending date to server:', error);
+          //console.error('Error while sending date to server:', error);
         });
   };
+
+    const numberListItems = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((number, index) => {
+        const gridColumnStart = 1 + index * 2;
+        return <p key={number} style={{ gridColumnStart }}>{number}</p>;
+    });
+
+    const renderReservationTime = () => {
+        // '2023-12-25' 형식의 날짜를 '23.12.25' 형식으로 변환
+        const formattedDate = selectedDate.replace(/^(\d{2})(\d{2})-(\d{2})-(\d{2})$/, '$2.$3.$4');
+
+        return (
+            <div className="reservation-time">
+                <h4>{formattedDate} {roomName} {startTime} ~ {endTime}</h4>
+            </div>
+        );
+    };
 
   const confirmReservation = async () => {
     const start = new Date(`${selectedDate}T${startTime}`);
@@ -136,7 +152,7 @@ function Reservation() {
         }
       }
       catch (error){
-        console.error('예약 에러', error);
+        //console.error('예약 에러', error);
         alert('오류가 발생하였습니다. 잠시 후에 다시 시도해주세요.');
       }
 
@@ -214,7 +230,7 @@ function Reservation() {
 
   const handleSlotSelect = (selectedSlot) => {
     // Handle the selection of the time slot here
-    console.log(`Selected time slot: ${selectedSlot}`);
+    //console.log(`Selected time slot: ${selectedSlot}`);
     // You can update the state or perform any other actions as needed
   };
 
@@ -223,6 +239,9 @@ function Reservation() {
       <div className="reservation-container">
         <h3>{roomName}</h3>
         <label className="label">예약 현황</label>
+          <div className="number-list">
+              {numberListItems}
+          </div>
 
         <TimeSlots times={times} reservedSlots={reservedSlots} startTime={startTime} endTime={endTime} onSelectSlot={handleSlotSelect} />
         <label htmlFor="reservationDate" className="label">예약 날짜</label>
@@ -243,6 +262,7 @@ function Reservation() {
         </select>
 
         <br />
+        {renderReservationTime()}
         <button className="reservation-button" onClick={confirmReservation}>예약하기</button>
 
       </div>

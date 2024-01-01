@@ -14,13 +14,14 @@ const pageRouter = require('./routes/page');
 const authRouter = require('./routes/auth');
 const adminRouter = require('./routes/admin');
 const { sequelize } = require('./models');
-const passportConfig = require('./passport');
+const passportConfig =require('./passport');
 
 
 
 const app = express();
 passportConfig();
 app.set('port', process.env.PORT || 3001);
+//app.set('port', process.env.PORT || 8001);
 app.set('view engine', 'html');
 nunjucks.configure('views', {
   express: app,
@@ -34,11 +35,22 @@ sequelize.sync({ force: false })
       console.error(err);
     });
 
+if(process.env.NODE_ENV === 'production'){
+  app.use(morgan('combined'));
+}
+else{
+  app.use(morgan('dev'));
+}
+
 var cors = require('cors');
 app.use(cors({
   origin: 'http://localhost:3000', // 클라이언트의 주소
   credentials: true
 }));
+// app.use(express.static(path.join(__dirname, './build')));
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, './build', 'index.html'));
+// });
 
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -55,6 +67,10 @@ app.use(session({
     maxAge: 60 * 60 * 1000,  // 1 hour
   },
 }));
+// if(process.env.NODE_ENV === 'production'){
+//   sessionOption.proxy = true;
+// }
+// app.use(session(sessionOption));
 app.use(passport.initialize());
 app.use(passport.session());
 

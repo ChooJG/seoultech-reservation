@@ -13,10 +13,10 @@ function Login(){
         axios.get('http://localhost:3001/auth/logout',
             { withCredentials: true })
             .then(response => {
-                console.log('로그아웃 성공');
+                //console.log('로그아웃 성공');
             })
             .catch(error => {
-                console.error('로그아웃 요청 중 오류 발생:', error);
+                //console.error('로그아웃 요청 중 오류 발생:', error);
             });
     }, []);
 
@@ -31,28 +31,36 @@ function Login(){
     const onLogin = async (event) => {
         event.preventDefault();
 
+        if (!userid || !password) {
+            alert('아이디와 비밀번호를 입력해주세요.');
+            return;
+        }
+
         try {
             const response =
                 await axios.post('http://localhost:3001/auth/login',
                     { userid, password },
-                    { withCredentials: true });
-            console.log("클라이언트 onlogin")
-            const isSuccess = response.data.success
+                    { withCredentials: true,
+                        validateStatus: function (status) {
+                            return status < 400 || status === 401; // Reject if the status code is 400 or above, but not 401
+                        }},
+                    );
+            const isSuccess = response.data.success;
 
             if (isSuccess) {
-                console.log(isSuccess);
+                //console.log(isSuccess);
                 navigate('/list');
             } else {
-                console.error(response.data.message);
-                alert('아이디 또는 비밀번호가 잘못되었습니다.')
+                //console.error(response.data.message);
+                alert(response.data.message);
             }
         } catch (error) {
-            console.error('로그인 요청에서 에러가 발생했습니다', error);
+            //console.error('로그인 요청에서 에러가 발생했습니다', error);
             alert('오류가 발생하였습니다. 잠시 후에 다시 시도해주세요.');
         }
     };
 
-    console.log(userid, password);
+    //console.log(userid, password);
 
     return(
         <div className="container">

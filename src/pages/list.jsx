@@ -20,7 +20,7 @@ function List() {
                 }
             })
             .catch(error => {
-                console.error('로그인 상태 확인 중 오류 발생:', error);
+                //console.error('로그인 상태 확인 중 오류 발생:', error);
                 navigate('/'); // 오류 발생 시 로그인 페이지로 리디렉션
             });
     }, [navigate]);

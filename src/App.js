@@ -7,6 +7,7 @@ import List from './pages/list'
 import MyPage from './pages/mypage';
 import Header from './components/Header';
 import { AuthContextProvider } from './AuthContext';
+import AdminPanel from "./pages/admin";
 
 function App() {
 
@@ -28,6 +29,7 @@ function MainLayout() {
                 <Route path='/list' element={<List />} />
                 <Route path="/reservation/:roomId" element={<Reservation />} />
                 <Route path='/mypage' element={<MyPage />} />
+                <Route path='/admin' element={<AdminPanel />} />
             </Routes>
         </>
     );

@@ -55,27 +55,28 @@ exports.deleteUser = async (req, res) => {
 
 
 exports.login = (req, res, next) => {
-    console.log("로그인중....")
-    console.log("세션 ID:", req.sessionID);
+    console.log("로그인중");
+    console.log("id : ", req.body.userid);
     passport.authenticate('local', (authError, user, info) => {
         if (authError){
             console.error(authError);
-            return res.status(500).json({error: authError});
+            return res.status(500).json({success: false, error: authError,
+                message: "서버에서 오류가 발생하였습니다. 잠시 후 시도해주세요"});
         }
         if (!user){
-            return res.status(401).json({error: 'Login failed', message: info.message});
+            return res.status(401).json({success: false, error: 'Login failed',
+                message: "아이디, 또는 비밀번호가 잘못되었습니다."});
         }
         return req.login(user, (loginError) => {
             if (loginError){
                 console.error(loginError);
-                return res.status(500).json({error: loginError});
+                return res.status(500).json({error: loginError,
+                    message: "서버에서 오류가 발생하였습니다. 잠시 후 시도해주세요"});
             }
             req.session.userInfo = {
                 role: user.role,
                 userid: user.userid,
             };
-            console.log("================");
-            console.log("user : ", req.session.userInfo);
             return res.status(200).json({success: true, message: 'Login successful'});
         });
     })(req, res, next);
@@ -97,14 +98,12 @@ exports.logout = (req, res) => {
 
 
 exports.isLogin = (req, res)=> {
-    console.log("=================");
-    console.log("로그인함?", req.session.userInfo);
     if (req.session && (req.session.userInfo || req.user)) {
         res.json({
             isAuthenticated: true,
-            userinfo: req.session.userInfo,
-            userid: req.session.userInfo.userid, // 사용자 정보 반환
-            role: req.session.userInfo.role,
+            userinfo: req.user,
+            userid: req.user.userid, // 사용자 정보 반환
+            role: req.user.role || req.session.userInfo.role,
         });
     } else {
         res.json({
