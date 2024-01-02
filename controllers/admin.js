@@ -109,7 +109,6 @@ exports.updateUser = async (req, res) => {
             where: {userid: newCompanyName}
         });
         if (exUser > 0){
-            console.log("dddddddddddddddddddddddddddddddd")
             return res.status(409).send("이미 존재하는 유저입니다.");
         }
         await User.update(updateData, {

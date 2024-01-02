@@ -43,47 +43,6 @@ const AdminPanel = () => {
         return <div>now loading...</div>; // 로그인 확인 중 표시
     }
 
-    // const handleDataChange = (id, newCompanyName, newPassword) => {
-    //     // 회사명 및 패스워드 변경 로직
-    //
-    //     if(!newCompanyName || !newPassword){
-    //         alert("새로운 회사명과 패스워드를 입력하세요");
-    //         return;
-    //     }
-    //
-    //     const updatedUsers = users.map((user) => {
-    //         axios.post('http://localhost:3001/admin/updateUser',
-    //             { newCompanyName, newPassword, id },
-    //             { withCredentials: true })
-    //             .then(response => {
-    //
-    //                 if(response.status === 409){
-    //                     alert("이미 존재하는 회사명입니다.")
-    //                 }
-    //                 else {
-    //                     axios.get('http://localhost:3001/admin/showUsers',
-    //                         {withCredentials: true})
-    //                         .then(response => {
-    //                             setUsers(response.data);
-    //                         })
-    //                         .catch(error => {
-    //                             console.error('Error fetching users:', error);
-    //                         });
-    //                 }
-    //             })
-    //             .catch(error => {
-    //                 if(error.response.status === 409){
-    //                     alert("이미 존재하는 회사명입니다.");
-    //                     return;
-    //                 }
-    //                 console.error('Error fetching users:', error);
-    //             });
-    //     });
-    //     //setUsers(updatedUsers);
-    //
-    //
-    // };
-
     const handleDataChange = (id, newCompanyName, newPassword) => {
         // 회사명 및 패스워드 변경 로직
 
@@ -118,7 +77,6 @@ const AdminPanel = () => {
                     });
             });
     };
-
 
     const handleDelete = (id) => {
         axios.post('http://localhost:3001/admin/deleteUser',

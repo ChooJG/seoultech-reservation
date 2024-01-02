@@ -77,6 +77,8 @@ exports.login = (req, res, next) => {
                 role: user.role,
                 userid: user.userid,
             };
+            console.log("vvvvvvvvvvvvvvvvvvvvvv");
+            console.log(req.user.userid)
             return res.status(200).json({success: true, message: 'Login successful'});
         });
     })(req, res, next);
@@ -98,6 +100,8 @@ exports.logout = (req, res) => {
 
 
 exports.isLogin = (req, res)=> {
+    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    console.log("로그인한 유저 : ", req.user);
     if (req.session && (req.session.userInfo || req.user)) {
         res.json({
             isAuthenticated: true,
