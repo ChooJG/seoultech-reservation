@@ -116,6 +116,7 @@ const AdminPanel = () => {
 
         if (!newUser || !newUserPw){
             alert("새로운 회사 명과 비밀번호를 입력해 주세요");
+            return;
         }
         axios.post('http://localhost:3001/admin/join',
             {newUser, newUserPw},
@@ -180,6 +181,10 @@ const AdminPanel = () => {
 
     };
 
+    const handleViewActivity = async (user) => {
+        navigate('/records', { state: { user } });
+    }
+
     return (
         <div className="container">
             <h1>관리자 페이지</h1>
@@ -213,6 +218,7 @@ const AdminPanel = () => {
                             }}>삭제</button>
                         </td>
                         <td>
+                            <button onClick={() => handleViewActivity(user)}>보기</button>
                             <button onClick={() => handleDownloadActivity(user)}>다운로드</button>
                         </td>
                     </tr>
@@ -220,7 +226,7 @@ const AdminPanel = () => {
                 </tbody>
             </table>
             <button className="download-button"
-            onClick={ () => handleAddUser() }>유저 추가</button><br/>
+            onClick={ () => handleAddUser() }>유저 추가</button>
             <button className="download-button">전체 활동내역 다운로드</button>
         </div>
     );

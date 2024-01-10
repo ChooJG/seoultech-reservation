@@ -42,10 +42,11 @@ function Reservation() {
 
   //페이지 온로드 되는 순간 오늘 예약된 목록 보이기
   useEffect(() => {
-    const today = new Date();
-    const formattedToday = today.toISOString().split('T')[0];
+      const today = new Date();
+      today.setHours(today.getHours() + 9); // UTC를 KST로 변환
+      const formattedToday = today.toISOString().split('T')[0];
 
-    // 서버에 오늘 날짜를 보냅니다.
+      // 서버에 오늘 날짜를 보냅니다.
     axios.post('http://localhost:3001/auth/resDate',
         {
           date: formattedToday,

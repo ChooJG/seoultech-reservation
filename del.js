@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const { User, Reserve, Booked } = require('./models'); // 'models'는 실제 모델이 위치한 경로로 변경해주세요.
 
 
-// Booked.findAll()
+// User.findAll()
 //     .then(users => {
 //         console.log(users);
 //     })
@@ -23,17 +23,17 @@ const { User, Reserve, Booked } = require('./models'); // 'models'는 실제 모
 
 
 
-User.create({
-    userid: 'admin6672',
-    password: 'admin6672',
-    role: 'admin',
-})
-    .then(newUser => {
-        console.log("새로운 사용자가 추가되었습니다: ", newUser);
-    })
-    .catch(error => {
-        console.log("데이터를 추가하는데 실패했습니다: ", error);
-    });
+// User.create({
+//     userid: 'admin6672',
+//     password: 'admin6672',
+//     role: 'admin',
+// })
+//     .then(newUser => {
+//         console.log("새로운 사용자가 추가되었습니다: ", newUser);
+//     })
+//     .catch(error => {
+//         console.log("데이터를 추가하는데 실패했습니다: ", error);
+//     });
 
 //console.log(Object.keys(Booked.rawAttributes));
 
@@ -56,3 +56,5 @@ User.create({
 // };
 //
 // recreateTable();
+
+

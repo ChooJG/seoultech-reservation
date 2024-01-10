@@ -204,6 +204,38 @@ exports.infoDown = async (req, res) => {
     }
 }
 
+exports.infoWatch = async (req, res) => {
+    const id = req.body.id;
+
+    try{
+
+        const userResArr = await Booked.findAll({
+            include: [{
+                model: User,
+                attributes: ['id'] // User 모델에서 'id' 필드만 가져옵니다.
+            }],
+            where: {UserId: id}, // 'UserId'는 Reserve 모델에서 User 모델을 참조하는 외래 키 필드명입니다.
+            order: [['date', 'DESC'], ['startTime', 'DESC']]
+        });
+
+        const userResArrSet = userResArr.map(item => {
+
+            return {
+                name: item.nick,
+                room: roomnames(item.roomValue),
+                date: item.date,
+                start: item.startTime,
+                end: item.endTime,
+            };
+        });
+        return res.send(userResArrSet);
+    }
+    catch (error){
+        console.log(error);
+        res.status(500).send('서버에서 오류가 발생했습니다.');
+    }
+}
+
 function formatDateWithDay(dateStr) {
     // 한국 시간대 설정
     moment.tz.setDefault("Asia/Seoul");
@@ -220,9 +252,9 @@ function roomnames(room){
     switch (room){
         case 'seminar':
             return '세미나실';
-        case 'meetroom1':
+        case 'meetRoom1':
             return '소회의실1';
-        case 'meetroom2':
+        case 'meetRoom2':
             return '소회의실2';
     }
     return '';

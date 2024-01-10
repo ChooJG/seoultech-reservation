@@ -2,7 +2,8 @@ const express = require('express');
 const passport = require('passport');
 
 const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
-const { join, deleteUser, showUsers, infoDown, updateUser } = require('../controllers/admin');
+const { join, deleteUser, showUsers, infoDown, updateUser, infoWatch }
+    = require('../controllers/admin');
 
 const router = express.Router();
 
@@ -15,5 +16,7 @@ router.get('/showUsers', showUsers);
 router.post('/infoDown', infoDown);
 
 router.post('/updateUser', updateUser);
+
+router.post('/infoWatch', infoWatch);
 
 module.exports = router;

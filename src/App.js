@@ -8,12 +8,14 @@ import MyPage from './pages/mypage';
 import Header from './components/Header';
 import { AuthContextProvider } from './AuthContext';
 import AdminPanel from "./pages/admin";
+import RecordPanel from "./pages/records";
+import Records from "./pages/records";
 
 function App() {
 
     return (
         <BrowserRouter>
-            <AuthContextProvider> {/* AuthContextProvider 추가 */}
+            <AuthContextProvider>
                 <MainLayout />
             </AuthContextProvider>
         </BrowserRouter>
@@ -30,6 +32,7 @@ function MainLayout() {
                 <Route path="/reservation/:roomId" element={<Reservation />} />
                 <Route path='/mypage' element={<MyPage />} />
                 <Route path='/admin' element={<AdminPanel />} />
+                <Route path='/records' element={<Records />} />
             </Routes>
         </>
     );

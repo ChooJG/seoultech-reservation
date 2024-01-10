@@ -27,9 +27,22 @@ nunjucks.configure('views', {
   express: app,
   watch: true,
 });
-sequelize.sync({ force: false })
+// sequelize.sync({ force: false })
+//     .then(() => {
+//       console.log("데이터베이스 연결 성공");
+//     })
+//     .catch((err) => {
+//       console.error(err);
+//     });
+
+sequelize
+    .sync({ force: false })
     .then(() => {
       console.log("데이터베이스 연결 성공");
+      return sequelize.query("SHOW VARIABLES LIKE 'version';");
+    })
+    .then(([results, metadata]) => {
+      console.log('MySQL version : ', results[0].Value);
     })
     .catch((err) => {
       console.error(err);
