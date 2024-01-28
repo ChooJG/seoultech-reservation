@@ -142,29 +142,36 @@ function Reservation() {
                   roomName,
                 },
                 { withCredentials: true });
-
-        const isSuccess = response.data.success
-        if (isSuccess){
-          alert("예약되었습니다.")
-          navigate('/mypage'); // '/mypage'로 라우팅합니다.
+        if (response.data.success){
+            alert("예약되었습니다.");
+            navigate('/mypage');
         }
         else{
-          alert("이미 존재하는 예약입니다.");
+            if(response.status === 400){
+                alert("예약 가능시간을 초과하였습니다.")
+            }
+            else if(response.status === 409){
+                alert("이미 존재하는 예약입니다.")
+            }
         }
+
+
       }
       catch (error){
           //console.error('예약 에러', error);
-        alert('오류가 발생하였습니다. 잠시 후에 다시 시도해주세요.');
+          if(error.response.status === 400){
+              alert("예약 가능시간을 초과하였습니다.");
+          }
+          else if(error.response.status === 409){
+              alert("이미 존재하는 예약입니다.");
+          }
+          else{
+              alert('오류가 발생하였습니다. 잠시 후에 다시 시도해주세요.');
+          }
       }
 
     }
   };
-
-  // const handleDateChange = (e) => {
-  //   setSelectedDate(e.target.value);
-  //   // 날짜가 변경되면 해당 날짜의 예약된 시간대를 가져와야 합니다.
-  //   // setReservedSlots(fetchReservedSlotsForDate(e.target.value));
-  // };
 
   const handleStartTimeChange = (e) => {
     setStartTime(e.target.value);

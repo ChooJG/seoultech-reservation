@@ -7,6 +7,7 @@ const { Parser } = require('json2csv');
 const moment = require("moment/moment");
 const sequelize = require("sequelize");
 const Excel = require('xlsx');
+const { Op } = require('sequelize');
 
 
 exports.join = async (req, res, next) => {
@@ -76,6 +77,11 @@ exports.deleteUser = async (req, res) => {
                 id: id
             }
         });
+        await Booked.update(
+            { cancel: 'cancel' },  // 변경할 속성
+            { where: { UserId: id } }  // 수정할 레코드를 찾는 조건
+        );
+
         return res.send('사용자가 삭제되었습니다.');
     } catch (error) {
         console.error('사용자 삭제 중 오류 발생:', error);
@@ -88,15 +94,10 @@ exports.deleteUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
     const id = req.body.id;
     const newCompanyName = req.body.newCompanyName;
-    const newPassword = req.body.newPassword;
 
     const updateData = {  // 수정하려는 데이터
         userid: newCompanyName,
-        password: newPassword
     };
-
-    console.log("새로운 회사와 비밀번호")
-    console.log(updateData);
 
     // 세션 정보가 없는 경우 처리
     if(!req.user){
@@ -112,6 +113,34 @@ exports.updateUser = async (req, res) => {
         if (exUser > 0){
             return res.status(409).send("이미 존재하는 유저입니다.");
         }
+        await User.update(updateData, {
+            where: { id: id }
+        });
+        return res.status(200).send('유저 정보를 수정하였습니다.');
+    }
+    catch (error){
+        console.log(error)
+    }
+
+}
+
+exports.updateUserPw = async (req, res) => {
+
+    const id = req.body.id;
+    const newCompanyPw = req.body.newCompanyPw;
+
+    const updateData = {  // 수정하려는 데이터
+        password: newCompanyPw,
+    };
+
+    // 세션 정보가 없는 경우 처리
+    if(!req.user){
+        return res.status(401).send('로그인이 필요합니다.');
+    }
+    if(req.user.role !== 'admin'){
+        return res.status(403).send('권한이 없습니다.');
+    }
+    try{
         await User.update(updateData, {
             where: { id: id }
         });
@@ -213,6 +242,9 @@ exports.infoDown = async (req, res) => {
 exports.infoWatch = async (req, res) => {
     const id = req.body.id;
 
+    const today = new Date(); // 오늘 날짜를 얻음
+    const todayStr = today.toISOString().split('T')[0];
+
     try{
 
         const userResArr = await Booked.findAll({
@@ -220,9 +252,13 @@ exports.infoWatch = async (req, res) => {
                 model: User,
                 attributes: ['id'] // User 모델에서 'id' 필드만 가져옵니다.
             }],
-            where: {UserId: id}, // 'UserId'는 Reserve 모델에서 User 모델을 참조하는 외래 키 필드명입니다.
+            where: {
+                UserId: id, // 'UserId'는 Reserve 모델에서 User 모델을 참조하는 외래 키 필드명입니다.
+                date: { [Op.gte]: todayStr } // 오늘 날짜 이후를 필터링하는 조건
+            },
             order: [['date', 'DESC'], ['startTime', 'DESC']]
         });
+
 
         const userResArrSet = userResArr.map(item => {
 
@@ -248,13 +284,22 @@ exports.getBookings = async (req, res) => {
     const room = req.body.room;
     const date = req.body.date;
 
+    let condition = {}; // where 조건을 담을 객체 생성
+
+    if (room) condition.roomValue = room; // room이 빈 문자열이 아니면 조건에 추가
+
+    if (date) {
+        condition.date = date; // date가 빈 문자열이 아니면 조건에 추가
+    } else {
+        const today = new Date(); // 오늘 날짜를 얻음
+        const todayStr = today.toISOString().split('T')[0]; // 오늘 날짜를 YYYY-MM-DD 형태의 문자열로 변환
+        condition.date = { [Op.gte]: todayStr }; // 오늘 날짜 이후를 필터링하는 조건
+    }
+
     try{
 
         const adminResList = await Booked.findAll({
-            where: {
-                roomValue: room,
-                date: date
-            },
+            where: condition, // 위에서 만든 조건 객체 사용
             order: [['date', 'DESC'], ['startTime', 'DESC']]
         });
 
@@ -262,6 +307,8 @@ exports.getBookings = async (req, res) => {
 
             return {
                 name: item.nick,
+                room: roomnames(item.roomValue),
+                date: item.date,
                 start: item.startTime,
                 end: item.endTime,
                 cancel: item.cancel,

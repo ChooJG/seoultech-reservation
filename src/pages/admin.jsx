@@ -43,16 +43,16 @@ const AdminPanel = () => {
         return <div>now loading...</div>; // 로그인 확인 중 표시
     }
 
-    const handleDataChange = (id, newCompanyName, newPassword) => {
+    const handleIdChange = (id, newCompanyName) => {
         // 회사명 및 패스워드 변경 로직
 
-        if (!newCompanyName || !newPassword) {
-            alert("새로운 회사명과 패스워드를 입력하세요");
+        if (!newCompanyName) {
+            alert("새로운 회사명을 입력하세요");
             return;
         }
 
         axios.post('http://localhost:3001/admin/updateUser',
-            { newCompanyName, newPassword, id },
+            { newCompanyName, id },
             { withCredentials: true })
             .then(response => {
                 if (response.status === 409) {
@@ -77,6 +77,31 @@ const AdminPanel = () => {
                     });
             });
     };
+
+    const handlePwChange = (id, newCompanyPw) => {
+        if (!newCompanyPw || newCompanyPw === "") {
+            alert("새로운 비밀번호를 입력하세요");
+            return;
+        }
+
+        axios.post('http://localhost:3001/admin/updateUserPw',
+            { newCompanyPw, id },
+            { withCredentials: true })
+            .then(response => {
+            })
+            .catch(error => {
+            })
+            .finally(() => {
+                axios.get('http://localhost:3001/admin/showUsers',
+                    { withCredentials: true })
+                    .then(response => {
+                        setUsers(response.data);
+                    })
+                    .catch(error => {
+                        //console.error('Error fetching users:', error);
+                    });
+            });
+    }
 
     const handleDelete = (id) => {
         axios.post('http://localhost:3001/admin/deleteUser',
@@ -207,6 +232,7 @@ const AdminPanel = () => {
                     <th>회사명</th>
                     <th>비밀번호</th>
                     <th>계정변경</th>
+                    <th>계정삭제</th>
                     <th>활동내역</th>
                 </tr>
                 </thead>
@@ -218,11 +244,18 @@ const AdminPanel = () => {
                         <td>
                             <button onClick={() => {
                                 const newCompanyName = prompt('새로운 회사명을 입력하세요:');
-                                const newPassword = prompt('새로운 패스워드를 입력하세요:');
-                                if (newCompanyName && newPassword) {
-                                    handleDataChange(user.id, newCompanyName, newPassword);
+                                if (newCompanyName) {
+                                    handleIdChange(user.id, newCompanyName);
                                 }
-                            }}>변경</button>
+                            }}>ID변경</button>
+                            <button onClick={() => {
+                                const newCompanyPw = prompt('새로운 비밀번호를 입력하세요:');
+                                if (newCompanyPw) {
+                                    handlePwChange(user.id, newCompanyPw);
+                                }
+                            }}>PW변경</button>
+                        </td>
+                        <td>
                             <button onClick={() => {
                                 const confirmDelete = window.confirm('정말로 이 계정을 삭제하시겠습니까?');
                                 if (confirmDelete) {

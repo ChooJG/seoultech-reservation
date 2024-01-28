@@ -86,7 +86,36 @@ exports.selectTime = async (req, res, next) => {
 
 
         if (exRes) {
-            return res.json({ success: false, message: "예약이 이미 존재합니다." });
+            return res.status(409).json({ success: false, message: "예약이 이미 존재합니다." });
+        }
+
+
+        const now = moment(); // 현재 날짜와 시간을 얻음
+        const todayStr = now.format('YYYY-MM-DD'); // 오늘 날짜를 YYYY-MM-DD 형태의 문자열로 변환
+
+        const futureReservations = await Reserve.findAll({
+            where: {
+                UserId,
+                date: { [Op.gte]: todayStr } // 오늘 날짜 이후를 필터링하는 조건
+            }
+        });
+
+        let totalHours = futureReservations.reduce((total, reservation) => {
+            const start = moment(reservation.date + 'T' + reservation.startTime); // 날짜와 시간을 결합하여 moment 객체 생성
+            const end = moment(reservation.date + 'T' + reservation.endTime); // 날짜와 시간을 결합하여 moment 객체 생성
+
+            if (start.isSameOrAfter(now) || (start.isSame(now, 'day') && end.isAfter(now))) {
+                const durationHours = end.diff(start, 'hours', true); // moment를 사용하여 시간의 차이를 계산
+                return total + durationHours;
+            }
+            return total;
+        }, 0);
+
+        const newReservationHours = moment(endTime, 'HH:mm').diff(moment(startTime, 'HH:mm'), 'hours', true); // moment를 사용하여 시간의 차이를 계산
+        totalHours += newReservationHours;
+
+        if (totalHours > 30) {
+            return res.status(400).json({ success: false, message: "예약 시간의 총합이 30시간을 넘습니다." });
         }
 
         const newReserve = await Reserve.create({
