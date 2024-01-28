@@ -6,6 +6,7 @@ const Booked = require("../models/booked");
 const { Parser } = require('json2csv');
 const moment = require("moment/moment");
 const sequelize = require("sequelize");
+const Excel = require('xlsx');
 
 
 exports.join = async (req, res, next) => {
@@ -161,48 +162,53 @@ exports.showUsers = async (req, res) => {
     }
 }
 
-
 exports.infoDown = async (req, res) => {
-    //const userid = req.body.userid;
     const id = req.body.id;
 
-    try{
-        // const user = await User.findOne({ where: { id: id } });
-        // const id = user ? user.id : null;
-
+    try {
         const userResArr = await Booked.findAll({
             include: [{
                 model: User,
-                attributes: ['id'] // User 모델에서 'id' 필드만 가져옵니다.
+                attributes: ['id']
             }],
-            where: {UserId: id}, // 'UserId'는 Reserve 모델에서 User 모델을 참조하는 외래 키 필드명입니다.
+            where: {UserId: id},
             order: [['date', 'DESC'], ['startTime', 'DESC']]
         });
 
-        const userResArrSet = userResArr.map(item => {
+        // 데이터가 없을 경우 처리
+        if (!userResArr || userResArr.length === 0) {
+            return res.status(404).send('해당하는 예약 정보가 없습니다.');
+        }
 
+        const userResArrSet = userResArr.map(item => {
             return {
-                name: item.nick,
-                room: item.roomValue,
-                date: item.date,
-                start: item.startTime,
-                end: item.endTime,
+                회사명: item.nick,
+                회의실: roomnames(item.roomValue),
+                날짜: item.date,
+                시작시간: item.startTime,
+                종료시간: item.endTime,
+                취소여부: item.cancel === 'cancel' ? '취소' : item.cancel,
             };
         });
 
-        const jsonReservations = JSON.parse(JSON.stringify(userResArrSet));
-        const json2csvParser = new Parser();
-        const csv = json2csvParser.parse(jsonReservations);
+        // JSON 데이터를 Excel 워크시트로 변환
+        const worksheet = Excel.utils.json_to_sheet(userResArrSet);
+        const workbook = Excel.utils.book_new();
+        Excel.utils.book_append_sheet(workbook, worksheet, 'Reservations');
 
-        res.header('Content-Type', 'text/csv');
-        res.attachment('reservations.csv');
-        return res.send(csv);
-    }
-    catch (error){
+        // 버퍼로 Excel 파일 생성
+        const excelBuffer = Excel.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+        // 응답 헤더 설정 및 파일 전송
+        res.header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.attachment('reservations.xlsx');
+        return res.send(excelBuffer);
+    } catch (error) {
         console.log(error);
         res.status(500).send('서버에서 오류가 발생했습니다.');
     }
-}
+};
+
 
 exports.infoWatch = async (req, res) => {
     const id = req.body.id;
@@ -226,6 +232,7 @@ exports.infoWatch = async (req, res) => {
                 date: item.date,
                 start: item.startTime,
                 end: item.endTime,
+                cancel: item.cancel,
             };
         });
         return res.send(userResArrSet);
@@ -234,6 +241,38 @@ exports.infoWatch = async (req, res) => {
         console.log(error);
         res.status(500).send('서버에서 오류가 발생했습니다.');
     }
+}
+
+exports.getBookings = async (req, res) => {
+
+    const room = req.body.room;
+    const date = req.body.date;
+
+    try{
+
+        const adminResList = await Booked.findAll({
+            where: {
+                roomValue: room,
+                date: date
+            },
+            order: [['date', 'DESC'], ['startTime', 'DESC']]
+        });
+
+        const userResArrSet = adminResList.map(item => {
+
+            return {
+                name: item.nick,
+                start: item.startTime,
+                end: item.endTime,
+                cancel: item.cancel,
+            };
+        });
+        return res.send(userResArrSet);
+    }
+    catch (error){
+        console.log(error);
+    }
+
 }
 
 function formatDateWithDay(dateStr) {

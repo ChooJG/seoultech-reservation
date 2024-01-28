@@ -95,6 +95,10 @@ function MyPage() {
         //console.log(event.target);  // 클릭된 버튼의 정보
         //console.log(reservation.id);   // 예약 정보
 
+        if(!window.confirm("예약을 취소하시겠습니까?")){
+            return;
+        }
+
         try {
             // 서버에 예약 취소 요청을 보냅니다.
             const response =

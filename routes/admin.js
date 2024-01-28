@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 
 const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
-const { join, deleteUser, showUsers, infoDown, updateUser, infoWatch }
+const { join, deleteUser, showUsers, infoDown, updateUser, infoWatch, getBookings }
     = require('../controllers/admin');
 
 const router = express.Router();
@@ -18,5 +18,7 @@ router.post('/infoDown', infoDown);
 router.post('/updateUser', updateUser);
 
 router.post('/infoWatch', infoWatch);
+
+router.post('/getBookings', getBookings);
 
 module.exports = router;

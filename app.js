@@ -20,8 +20,8 @@ const passportConfig =require('./passport');
 
 const app = express();
 passportConfig();
-app.set('port', process.env.PORT || 3001);
 //app.set('port', process.env.PORT || 8001);
+app.set('port', process.env.PORT || 3001);
 app.set('view engine', 'html');
 nunjucks.configure('views', {
   express: app,
@@ -55,12 +55,12 @@ else{
   app.use(morgan('dev'));
 }
 
-// var cors = require('cors');
-// app.use(cors({
-//   origin: 'http://localhost:3000', // 클라이언트의 주소
-//   credentials: true
-// }));
-app.use(express.static(path.join(__dirname, './build')));
+var cors = require('cors');
+app.use(cors({
+  origin: 'http://localhost:3000', // 클라이언트의 주소
+  credentials: true
+}));
+//app.use(express.static(path.join(__dirname, './build')));
 
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -90,9 +90,9 @@ app.use('/', pageRouter);
 app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, './build', 'index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, './build', 'index.html'));
+// });
 
 app.use((req, res, next)=> {
   const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);

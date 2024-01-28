@@ -8,8 +8,9 @@ import MyPage from './pages/mypage';
 import Header from './components/Header';
 import { AuthContextProvider } from './AuthContext';
 import AdminPanel from "./pages/admin";
-import RecordPanel from "./pages/records";
+//import RecordPanel from "./pages/records";
 import Records from "./pages/records";
+import Bookings from "./pages/bookings";
 
 function App() {
 
@@ -33,6 +34,7 @@ function MainLayout() {
                 <Route path='/mypage' element={<MyPage />} />
                 <Route path='/admin' element={<AdminPanel />} />
                 <Route path='/records' element={<Records />} />
+                <Route path='/bookings' element={<Bookings />} />
             </Routes>
         </>
     );

@@ -2,13 +2,13 @@ const Sequelize = require('sequelize');
 const { User, Reserve, Booked } = require('./models'); // 'models'는 실제 모델이 위치한 경로로 변경해주세요.
 
 
-// User.findAll()
-//     .then(users => {
-//         console.log(users);
-//     })
-//     .catch(error => {
-//         console.log("데이터를 불러오는데 실패했습니다: ", error);
-//     });
+Booked.findAll()
+    .then(users => {
+        console.log(users);
+    })
+    .catch(error => {
+        console.log("데이터를 불러오는데 실패했습니다: ", error);
+    });
 
 
 // User.destroy({

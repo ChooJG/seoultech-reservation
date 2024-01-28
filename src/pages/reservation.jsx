@@ -35,7 +35,7 @@ function Reservation() {
           }
         })
         .catch(error => {
-          //console.error('로그인 상태 확인 중 오류 발생:', error);
+            //console.error('로그인 상태 확인 중 오류 발생:', error);
           navigate(`/`);
         });
   }, [navigate, roomId]); // id가 변경될 때마다 로그인 상태를 재확인합니다
@@ -58,7 +58,7 @@ function Reservation() {
           setReservedSlots(initialReservedTimes);
         })
         .catch(error => {
-          //console.error('Error while sending date to server:', error);
+            //console.error('Error while sending date to server:', error);
         });
   }, []);
 
@@ -78,7 +78,7 @@ function Reservation() {
 
     setSelectedDate(e.target.value);
     const nowResDate = e.target.value;
-    //console.log(e.target.value)
+      //console.log(e.target.value)
 
     axios.post('http://localhost:3001/auth/resDate',
         {
@@ -91,7 +91,7 @@ function Reservation() {
           setReservedSlots(reservedTimes);
         })
         .catch(error => {
-          //console.error('Error while sending date to server:', error);
+            //console.error('Error while sending date to server:', error);
         });
   };
 
@@ -153,7 +153,7 @@ function Reservation() {
         }
       }
       catch (error){
-        //console.error('예약 에러', error);
+          //console.error('예약 에러', error);
         alert('오류가 발생하였습니다. 잠시 후에 다시 시도해주세요.');
       }
 
@@ -231,7 +231,7 @@ function Reservation() {
 
   const handleSlotSelect = (selectedSlot) => {
     // Handle the selection of the time slot here
-    //console.log(`Selected time slot: ${selectedSlot}`);
+      //console.log(`Selected time slot: ${selectedSlot}`);
     // You can update the state or perform any other actions as needed
   };
 

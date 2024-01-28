@@ -34,7 +34,7 @@ const AdminPanel = () => {
                 setUsers(response.data);
             })
             .catch(error => {
-                console.error('Error fetching users:', error);
+                //console.error('Error fetching users:', error);
             });
     }, []);
 
@@ -64,7 +64,7 @@ const AdminPanel = () => {
                     alert("이미 존재하는 회사명입니다.");
                     return;
                 }
-                console.error('Error fetching users:', error);
+                //console.error('Error fetching users:', error);
             })
             .finally(() => {
                 axios.get('http://localhost:3001/admin/showUsers',
@@ -73,7 +73,7 @@ const AdminPanel = () => {
                         setUsers(response.data);
                     })
                     .catch(error => {
-                        console.error('Error fetching users:', error);
+                        //console.error('Error fetching users:', error);
                     });
             });
     };
@@ -95,7 +95,7 @@ const AdminPanel = () => {
                         setUsers(response.data);
                     })
                     .catch(error => {
-                        console.error('Error fetching users:', error);
+                        //console.error('Error fetching users:', error);
                     });
             })
             .catch(error => {
@@ -105,8 +105,12 @@ const AdminPanel = () => {
                 else {
                     alert("서버에서 오류가 발생하였습니다. 잠시 후 다시 시도해주세요.");
                 }
-                console.error('Error fetching users:', error);
+                //console.error('Error fetching users:', error);
             });
+    }
+
+    const handleRecords = () => {
+        navigate('/bookings');
     }
 
     const handleAddUser = () => {
@@ -134,7 +138,7 @@ const AdminPanel = () => {
                         setUsers(response.data);
                     })
                     .catch(error => {
-                        console.error('Error fetching users:', error);
+                        //console.error('Error fetching users:', error);
                     });
             })
             .catch(error => {
@@ -144,7 +148,7 @@ const AdminPanel = () => {
                 else{
                     alert("서버에서 오류가 발생하였습니다. 잠시 후 다시 시도해주세요")
                 }
-                console.error('Error fetching users:', error);
+                //console.error('Error fetching users:', error);
             });
 
 
@@ -164,11 +168,16 @@ const AdminPanel = () => {
                 responseType: 'blob', // important
             });
 
+            if(response.status === 404){
+                alert("예약 내역이 없습니다.")
+                return;
+            }
+
             // 서버로부터 받은 파일을 다운로드 합니다.
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
 
-            const csv_name = user.companyName + '_reservations.csv';
+            const csv_name = user.companyName + '_reservations.xlsx';
 
             link.href = url;
             link.setAttribute('download', csv_name); // 다운로드 받을 파일의 이름입니다.
@@ -176,7 +185,11 @@ const AdminPanel = () => {
             link.click();
 
         } catch (error) {
-            console.error(`Error: ${error}`);  // 요청이 실패하면 콘솔에 에러 메시지를 출력합니다.
+            if (error.response && error.response.status === 404) {
+                alert("예약 내역이 없습니다");
+                return;
+            }
+            //console.error(`Error: ${error}`);  // 요청이 실패하면 콘솔에 에러 메시지를 출력합니다.
         }
 
     };
@@ -227,7 +240,8 @@ const AdminPanel = () => {
             </table>
             <button className="download-button"
             onClick={ () => handleAddUser() }>유저 추가</button>
-            <button className="download-button">전체 활동내역 다운로드</button>
+            <button className="download-button"
+                    onClick={ () => handleRecords() }>전체 활동 내역</button>
         </div>
     );
 };

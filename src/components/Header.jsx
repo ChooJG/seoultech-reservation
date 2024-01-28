@@ -14,15 +14,27 @@ function Header() {
             { withCredentials: true })
             .then(response => {
                 const role = response.data.role;
-                if(role == 'admin'){
+                if(role === 'admin'){
                     const isAdmin = true;
                     setIsAdmin(isAdmin);
                 }
             })
             .catch(error => {
-                console.error('Login error:', error);
+                //console.error('Login error:', error);
             });
     };
+
+    function goLogout() {
+        axios.get('http://localhost:3001/auth/logout',
+                { withCredentials: true })
+                .then(response => {
+                    //console.log('로그아웃 성공');
+                    navigate('/')
+                })
+                .catch(error => {
+                    //console.error('로그아웃 요청 중 오류 발생:', error);
+                });
+    }
 
     const redirectToHome = () => {
         navigate('/list'); // 클릭 시 /list 경로로 이동
@@ -57,7 +69,7 @@ function Header() {
                         <li onClick={() => navigateTo('/list')}>회의실 예약</li>
                         <li onClick={() => navigateTo('/mypage')}>나의 예약현황</li>
                         {isAdmin && <li onClick={() => navigateTo('/admin')}>관리자 페이지</li>}
-                        <li onClick={() => navigateTo('/')}>로그아웃</li>
+                        <li onClick={() => goLogout()}>로그아웃</li>
                     </ul>
                 </nav>
             </div>

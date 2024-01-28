@@ -1,10 +1,11 @@
 {
   "development": {
     "username": "root",
-    "password": "tiger",
+    "password": "tnoetnoez2!",
     "database": "seoultechRes",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "host": "cndowy21.cafe24.com",
+    "dialect": "mysql",
+    "port": 3306
   },
   "test": {
     "username": "root",
@@ -15,8 +16,8 @@
   },
   "production": {
     "username": "root",
-    "password": null,
-    "database": "database_production",
+    "password": "tiger",
+    "database": "seoultechRes",
     "host": "127.0.0.1",
     "dialect": "mysql"
   }

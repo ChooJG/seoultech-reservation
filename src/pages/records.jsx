@@ -40,7 +40,7 @@ const AdminPanel = () => {
                     setReservation(response.data);
                 })
                 .catch(error => {
-                    console.error('Error fetching users:', error);
+                    //console.error('Error fetching users:', error);
                 });
         }
     }, []);
@@ -57,30 +57,35 @@ const AdminPanel = () => {
     return (
         <div className="container">
             <h1>관리자 페이지</h1>
-            <table>
-                <thead>
-                <tr>
-                    <th>회사명</th>
-                    <th>회의실</th>
-                    <th>날짜</th>
-                    <th>시작시간</th>
-                    <th>종료시간</th>
-                </tr>
-                </thead>
-                <tbody>
-                {reservations.map((item) => (
-                    <tr key={item.id}>
-                        <td>{item.name}</td>
-                        <td>{item.room}</td>
-                        <td>{item.date}</td>
-                        <td>{item.start}</td>
-                        <td>{item.end}</td>
+            {reservations.length > 0 ? (
+                <table>
+                    <thead>
+                    <tr>
+                        <th>회사명</th>
+                        <th>회의실</th>
+                        <th>날짜</th>
+                        <th>시작시간</th>
+                        <th>종료시간</th>
+                        <th>취소여부</th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
-            <button className="download-button"
-                    onClick={ () => handleAddUser() }>뒤로가기</button>
+                    </thead>
+                    <tbody>
+                    {reservations.map((item) => (
+                        <tr key={item.id}>
+                            <td>{item.name}</td>
+                            <td>{item.room}</td>
+                            <td>{item.date}</td>
+                            <td>{item.start}</td>
+                            <td>{item.end}</td>
+                            <td>{item.cancel === 'cancel' ? '취소' : item.cancel}</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            ) : (
+                <p>예약 내역이 없습니다</p>
+            )}
+            <button className="download-button" onClick={ () => handleAddUser() }>뒤로가기</button>
         </div>
     );
 };

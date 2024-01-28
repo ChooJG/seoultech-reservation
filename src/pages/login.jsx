@@ -9,16 +9,32 @@ function Login(){
 
     const navigate = useNavigate();
 
+
     useEffect(() => {
-        axios.get('http://localhost:3001/auth/logout',
-            { withCredentials: true })
+        axios.get('http://localhost:3001/auth/isLogin'
+            , { withCredentials: true }) // 서버의 로그인 상태 확인 엔드포인트
             .then(response => {
-                //console.log('로그아웃 성공');
+                if (response.data.isAuthenticated) {
+                    navigate('/list');
+                }
             })
             .catch(error => {
-                //console.error('로그아웃 요청 중 오류 발생:', error);
+                console.error('로그인 상태 확인 중 오류 발생:', error);
+                navigate('/'); // 오류 발생 시 로그인 페이지로 리디렉션
             });
-    }, []);
+    }, [navigate]);
+
+
+    // useEffect(() => {
+    //     axios.get('http://localhost:3001/auth/logout',
+    //         { withCredentials: true })
+    //         .then(response => {
+    //             //console.log('로그아웃 성공');
+    //         })
+    //         .catch(error => {
+    //             //console.error('로그아웃 요청 중 오류 발생:', error);
+    //         });
+    // }, []);
 
     const onChangeHandleId = (event) => {
         setId(event.target.value);
