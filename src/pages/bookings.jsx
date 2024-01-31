@@ -14,6 +14,8 @@ const AdminPanel = () => {
     const [dates, setDates] = useState([]);
     const [selectedRoom, setSelectedRoom] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
+    const [downRoom, setDownRoom] = useState('');
+    const [downDate, setDownDate] = useState('');
 
 
     useEffect(() => {
@@ -53,7 +55,8 @@ const AdminPanel = () => {
 
     const getBookings = async () => {
         try {
-
+            setDownRoom(selectedRoom);
+            setDownDate(selectedDate);
             const adminResList = await axios.post('http://localhost:3001/admin/getBookings', { // 여기에 실제 서버 URL을 입력하세요.
                     room: selectedRoom,
                     date: selectedDate
@@ -62,7 +65,7 @@ const AdminPanel = () => {
             setReservation(adminResList.data);
         }
         catch (error){
-            console.log(error)
+            //console.log(error)
         }
     }
 
@@ -80,7 +83,7 @@ const AdminPanel = () => {
 
     const handleDateChange = (e) => {
         if(e.target.value === "::전체::"){
-            setSelectedRoom("");
+            setSelectedDate("");
         }
         else{
             setSelectedDate(e.target.value);
@@ -91,11 +94,84 @@ const AdminPanel = () => {
         getBookings();
     }
 
+    const handleDownload = async () => {
+        if(!window.confirm("예약 내역을 다운로드 합니다")){
+            return;
+        }
+
+        try {
+            // 서버에 파일 다운로드 요청을 보냅니다.
+            const response = await axios({
+                url: 'http://localhost:3001/admin/downloadBookings',
+                method: 'POST',
+                data: { room: downRoom, date: downDate },
+                withCredentials: true,
+                responseType: 'blob',
+            });
+
+            if(response.status === 404){
+                alert("예약 내역이 없습니다.")
+                return;
+            }
+
+            // 서버로부터 받은 파일을 다운로드 합니다.
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+
+            const csv_name = '' + roomNames(downRoom) + downDate + '_reservations.xlsx';
+
+            link.href = url;
+            link.setAttribute('download', csv_name); // 다운로드 받을 파일의 이름입니다.
+            document.body.appendChild(link);
+            link.click();
+
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                alert("예약 내역이 없습니다");
+                return;
+            }
+            //console.error(`Error: ${error}`);  // 요청이 실패하면 콘솔에 에러 메시지를 출력합니다.
+        }
+
+    }
+
+    const handleCancel = async (id) => {
+        if(!window.confirm("취소하시겠습니까?")){
+            return
+        }
+        try {
+            // 서버에 예약 취소 요청을 보냅니다.
+            const response =
+                await axios.post('http://localhost:3001/auth/deleteRes',
+                    { id: id },
+                    { withCredentials: true });
+
+            if(response.data){
+                getBookings();
+            }
+        } catch (error) {
+            //console.error(`Error: ${error}`);
+        }
+
+    };
+
+    function roomNames(roomValue){
+        switch (roomValue){
+            case 'seminar':
+                return "세미나실";
+            case 'meetRoom1':
+                return "소회의실1";
+            case 'meetRoom2':
+                return "소회의실2";
+        }
+        return ""
+    }
+
 
     return (
         <div className="container">
             <h1>관리자 페이지</h1>
-            <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <select name="room" onChange={handleRoomChange}>
                     <option value="">::전체::</option>
                     <option value="seminar">세미나실</option>
@@ -109,8 +185,13 @@ const AdminPanel = () => {
                         </option>
                     ))}
                 </select>
-                <button onClick={handleClick}>
+                <button style={{ width: '150px', height: '30px' }} onClick={handleClick}>
                     검색
+                </button>
+            </div>
+            <div>
+                <button className="download-button" onClick={handleDownload}>
+                    다운로드
                 </button>
             </div>
             {reservations.length > 0 ? (
@@ -133,7 +214,12 @@ const AdminPanel = () => {
                             <td>{item.date}</td>
                             <td>{item.start}</td>
                             <td>{item.end}</td>
-                            <td>{item.cancel === 'cancel' ? '취소' : item.cancel}</td>
+                            <td>
+                                {item.cancel === '취소'
+                                    ? '취소'
+                                    : <button onClick={() => handleCancel(item.id)}>취소하기</button>
+                                }
+                            </td>
                         </tr>
                     ))}
                     </tbody>

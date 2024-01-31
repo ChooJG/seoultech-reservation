@@ -8,6 +8,8 @@ function List() {
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
+    const [leastTime, setLeastTime] = useState(0);
+    const [isAdmin, setIsAdmin] = useState("false");
 
     useEffect(() => {
         axios.get('http://localhost:3001/auth/isLogin'
@@ -15,6 +17,9 @@ function List() {
             .then(response => {
                 if (response.data.isAuthenticated) {
                     setIsLoggedIn(true);
+                    if (response.data.role === 'admin'){
+                        setIsAdmin("admin");
+                    }
                 } else {
                     navigate('/'); // 로그인 페이지로 리디렉션
                 }
@@ -24,6 +29,22 @@ function List() {
                 navigate('/'); // 오류 발생 시 로그인 페이지로 리디렉션
             });
     }, [navigate]);
+
+    useEffect(() => {
+        axios.get('http://localhost:3001/auth/ckLeastTime'
+            , { withCredentials: true }) // 서버의 로그인 상태 확인 엔드포인트
+            .then(response => {
+                if (isAdmin === "admin"){
+                    setLeastTime("00");
+                }
+                else{
+                    setLeastTime(response.data.value);
+                }
+            })
+            .catch(error => {
+                //console.error(error);
+            });
+    }, [isAdmin]);
 
     if (!isLoggedIn) {
         return <div>now loading...</div>; // 로그인 확인 중 표시
@@ -35,12 +56,15 @@ function List() {
         { id: 1, name: '세미나실', image: '/seminar1.jpg' },
         { id: 2, name: '소회의실1', image: '/seminar2.jpg' },
         { id: 3, name: '소회의실2', image: '/seminar3.jpg' },
+        { id: 4, name: '전체 회의실', image: '/whole.png' },
         // ... 추가 회의실 ...
     ];
 
     return (
         <div className="list-container">
-            <h3 style={{ textAlign: "center" }}>예약 장소 선택</h3>
+            <h3 style={{ textAlign: "center" }}>
+                예약 장소 선택 (잔여시간 : <span style={{ color: 'red' }}>{leastTime}</span>시간)
+            </h3>
             <div className="meeting-rooms">
                 {meetingRooms.map(room => (
                     <Link to={`/reservation/${room.id}`} key={room.id} className="meeting-room">

@@ -4,7 +4,7 @@ class Reserve extends Sequelize.Model{
     static initiate(sequelize){
         Reserve.init({
             roomValue: {
-                type: Sequelize.ENUM('seminar', 'meetRoom1', 'meetRoom2'),
+                type: Sequelize.ENUM('seminar', 'meetRoom1', 'meetRoom2', 'whole'),
                 allowNull: false,
             },
             date: {

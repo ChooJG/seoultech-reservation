@@ -8,13 +8,14 @@ const moment = require('moment-timezone');
 function Reservation() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   // Generate time slots from 9:00 to 17:30 in 30-minute intervals
   const times = generateTimeSlots();
 
   // Generate dates for the next 10 days
-  const availableDates = generateDates();
+  const availableDates = generateDates(isAdmin);
 
   const [startTime, setStartTime] = useState(times[0]);
   const [endTime, setEndTime] = useState(times[1]);
@@ -25,11 +26,14 @@ function Reservation() {
   const [reservedSlots, setReservedSlots] = useState(['']);
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/auth/isLogin/${roomId}`,
+    axios.get(`http://localhost:3001/auth/isLogin`,
         { withCredentials: true })
         .then(response => {
           if (response.data.isAuthenticated) {
             setIsLoggedIn(true);
+            if(response.data.role === 'admin'){
+                setIsAdmin(true);
+            }
           } else {
             navigate(`/`);
           }
@@ -67,6 +71,7 @@ function Reservation() {
     '1': '세미나실',
     '2': '소회의실1',
     '3': '소회의실2',
+    '4': '전체회의실',
     // 필요에 따라 더 많은 매핑을 추가하세요
   };
 
@@ -314,9 +319,10 @@ function generateTimeSlots() {
   return slots;
 }
 
-function generateDates() {
+function generateDates(isAdmin) {
     const dates = [];
-    for (let i = 0; i < 10; i++) {
+    const daysToAdd = isAdmin ? 365 : 10;
+    for (let i = 0; i < daysToAdd; i++) {
         const date = moment().tz('Asia/Seoul').add(i, 'days');
         dates.push(date.format('YYYY-MM-DD'));
     }

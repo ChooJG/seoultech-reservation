@@ -1,9 +1,9 @@
 {
   "development": {
     "username": "root",
-    "password": "tnoetnoez2!",
+    "password": "tiger",
     "database": "seoultechRes",
-    "host": "cndowy21.cafe24.com",
+    "host": "127.0.0.1",
     "dialect": "mysql",
     "port": 3306
   },

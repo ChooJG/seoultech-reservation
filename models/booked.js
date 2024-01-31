@@ -8,7 +8,7 @@ class Booked extends Sequelize.Model{
                 allowNull: false,
             },
             roomValue: {
-                type: Sequelize.ENUM('seminar', 'meetRoom1', 'meetRoom2'),
+                type: Sequelize.ENUM('seminar', 'meetRoom1', 'meetRoom2', 'whole'),
                 allowNull: false,
             },
             date: {

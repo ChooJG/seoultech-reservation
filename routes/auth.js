@@ -3,7 +3,7 @@ const passport = require('passport');
 
 const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
 const { join, login, logout, isLogin } = require('../controllers/auth');
-const { selectRoom, selectTime, resDate, getUserRes, deleteRes }
+const { selectRoom, selectTime, resDate, getUserRes, deleteRes, ckLeastTime }
     = require('../controllers/reserve');
 
 const router = express.Router();
@@ -31,5 +31,7 @@ router.post('/resDate', resDate);
 router.get('/getUserRes', getUserRes);
 
 router.post('/deleteRes', deleteRes);
+
+router.get('/ckLeastTime', ckLeastTime);
 
 module.exports = router;

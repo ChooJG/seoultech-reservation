@@ -3,7 +3,7 @@ const passport = require('passport');
 
 const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
 const { join, deleteUser, showUsers, infoDown, updateUser, updateUserPw,
-    infoWatch, getBookings }
+    infoWatch, getBookings, downloadBookings }
     = require('../controllers/admin');
 
 const router = express.Router();
@@ -23,5 +23,7 @@ router.post('/updateUserPw', updateUserPw);
 router.post('/infoWatch', infoWatch);
 
 router.post('/getBookings', getBookings);
+
+router.post('/downloadBookings', downloadBookings)
 
 module.exports = router;

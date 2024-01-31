@@ -54,6 +54,37 @@ const AdminPanel = () => {
         navigate('/admin');
     };
 
+    const handleCancel = async (id) => {
+        if(!window.confirm("취소하시겠습니까?")){
+            return
+        }
+        try {
+            // 서버에 예약 취소 요청을 보냅니다.
+            const response =
+                await axios.post('http://localhost:3001/auth/deleteRes',
+                    { id: id },
+                    { withCredentials: true });
+
+            if(response.data){
+                let userinfo;
+                if (location.state !== null) {
+                    userinfo = location.state.user;
+                    axios.post('http://localhost:3001/admin/infoWatch',
+                        { id: userinfo.id },
+                        { withCredentials: true })
+                        .then(response => {
+                            setReservation(response.data);
+                        })
+                        .catch(error => {
+                            //console.error('Error fetching users:', error);
+                        });
+                }
+            }
+        } catch (error) {
+            //console.error(`Error: ${error}`);
+        }
+    }
+
     return (
         <div className="container">
             <h1>관리자 페이지</h1>
@@ -77,7 +108,12 @@ const AdminPanel = () => {
                             <td>{item.date}</td>
                             <td>{item.start}</td>
                             <td>{item.end}</td>
-                            <td>{item.cancel === 'cancel' ? '취소' : item.cancel}</td>
+                            <td>
+                                {item.cancel === 'cancel'
+                                    ? '취소'
+                                    : <button onClick={() => handleCancel(item.id)}>취소하기</button>
+                                }
+                            </td>
                         </tr>
                     ))}
                     </tbody>

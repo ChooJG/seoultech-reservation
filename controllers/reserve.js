@@ -3,6 +3,8 @@ const User = require("../models/user");
 const Booked = require('../models/booked');
 const moment = require('moment');
 require('moment-timezone');
+const { Op } = require("sequelize");
+const { sequelize } = require('../models');
 
 
 exports.selectRoom = async (req, res, next) => {
@@ -41,64 +43,73 @@ exports.selectTime = async (req, res, next) => {
         case '소회의실2':
             roomValue = 'meetRoom2';
             break;
+        case '전체회의실':
+            roomValue = 'whole';
+            break;
     }
 
+    let transaction;
+
     try{
+        transaction = await sequelize.transaction();
         if (!req.user) {
             res.status(401).send('로그인이 필요합니다.');
             return;
         }
         const UserId = req.user.id;
-        const { Op } = require("sequelize");
+
+        let whereCondition = {
+            date,
+            [Op.or]: [
+                {
+                    startTime: {
+                        [Op.lte]: startTime,
+                    },
+                    endTime: {
+                        [Op.gt]: startTime,
+                    },
+                },
+                {
+                    startTime: {
+                        [Op.lt]: endTime,
+                    },
+                    endTime: {
+                        [Op.gte]: endTime,
+                    },
+                },
+                {
+                    startTime: {
+                        [Op.gte]: startTime,
+                    },
+                    endTime: {
+                        [Op.lte]: endTime,
+                    },
+                },
+            ],
+        };
+
+        if (roomValue !== 'whole') {
+            whereCondition.roomValue = roomValue;
+        }
 
         const exRes = await Reserve.findOne({
-            where: {
-                date,
-                roomValue,
-                [Op.or]: [
-                    {
-                        startTime: {
-                            [Op.lte]: startTime, // 시작 시간이 DB의 시작 시간보다 같거나 늦을 경우
-                        },
-                        endTime: {
-                            [Op.gt]: startTime, // 끝나는 시간이 DB의 시작 시간보다 빠를 경우
-                        },
-                    },
-                    {
-                        startTime: {
-                            [Op.lt]: endTime, // 시작 시간이 DB의 끝나는 시간보다 빠를 경우
-                        },
-                        endTime: {
-                            [Op.gte]: endTime, // 끝나는 시간이 DB의 끝나는 시간보다 같거나 늦을 경우
-                        },
-                    },
-                    {
-                        startTime: {
-                            [Op.gte]: startTime, // 시작 시간이 새로운 시작 시간보다 늦거나 같은 경우
-                        },
-                        endTime: {
-                            [Op.lte]: endTime, // 종료 시간이 새로운 종료 시간보다 이른 경우
-                        },
-                    },
-                ],
-            },
-        });
-
+            where: whereCondition,
+        }, { transaction });
 
         if (exRes) {
+            await transaction.rollback();
             return res.status(409).json({ success: false, message: "예약이 이미 존재합니다." });
         }
 
-
-        const now = moment(); // 현재 날짜와 시간을 얻음
-        const todayStr = now.format('YYYY-MM-DD'); // 오늘 날짜를 YYYY-MM-DD 형태의 문자열로 변환
+        const now = moment();
+        const todayStr = now.format('YYYY-MM-DD');
 
         const futureReservations = await Reserve.findAll({
             where: {
                 UserId,
-                date: { [Op.gte]: todayStr } // 오늘 날짜 이후를 필터링하는 조건
+                date: { [Op.gte]: todayStr }
             }
-        });
+        }, { transaction });
 
         let totalHours = futureReservations.reduce((total, reservation) => {
             const start = moment(reservation.date + 'T' + reservation.startTime); // 날짜와 시간을 결합하여 moment 객체 생성
@@ -111,36 +122,90 @@ exports.selectTime = async (req, res, next) => {
             return total;
         }, 0);
 
-        const newReservationHours = moment(endTime, 'HH:mm').diff(moment(startTime, 'HH:mm'), 'hours', true); // moment를 사용하여 시간의 차이를 계산
+
+        let newReservationHours = moment(endTime, 'HH:mm').diff(moment(startTime, 'HH:mm'), 'hours', true);
+        if(roomValue === 'whole'){
+            newReservationHours = newReservationHours*3;
+        }
         totalHours += newReservationHours;
 
-        if (totalHours > 30) {
+        if (totalHours > 30 && req.user.role !== 'admin') {
             return res.status(400).json({ success: false, message: "예약 시간의 총합이 30시간을 넘습니다." });
         }
 
-        const newReserve = await Reserve.create({
-            roomValue,
-            date,
-            startTime,
-            endTime,
-            UserId,
-        });
-        // 생성된 레코드의 ID를 얻습니다.
-        const ReserveId = newReserve.id;
-        await Booked.create({
-            nick: req.user.userid,
-            roomValue,
-            date,
-            startTime,
-            endTime,
-            UserId,
-            ReserveId,
-        })
+        let roomValues = [roomValue];
+        if (roomValue === 'whole') {
+            roomValues = ['seminar', 'meetRoom1', 'meetRoom2'];
+        }
+
+        for (let i = 0; i < roomValues.length; i++) {
+            const newReserve = await Reserve.create({
+                roomValue: roomValues[i],
+                date,
+                startTime,
+                endTime,
+                UserId,
+            }, { transaction });
+            // 생성된 레코드의 ID를 얻습니다.
+            const ReserveId = newReserve.id;
+            await Booked.create({
+                nick: req.user.userid,
+                roomValue: roomValues[i],
+                date,
+                startTime,
+                endTime,
+                UserId,
+                ReserveId,
+            }, { transaction });
+        }
+        await transaction.commit();
         res.json({ success: true, message: '예약이 성공적으로 완료되었습니다.' });
     }
     catch (error){
+        await transaction.rollback();
         console.log(error);
         res.status(500).json({ success: false, message: '서버에서 오류가 발생했습니다. 잠시 후에 시도해주세요.' });
+    }
+}
+
+exports.ckLeastTime = async (req, res) => {
+    let transaction;
+    try {
+
+        transaction = await sequelize.transaction();
+        if (!req.user) {
+            res.status(401).send('로그인이 필요합니다.');
+            return;
+        }
+        const UserId = req.user.id;
+
+        const now = moment();
+        const todayStr = now.format('YYYY-MM-DD');
+
+        const futureReservations = await Reserve.findAll({
+            where: {
+                UserId,
+                date: { [Op.gte]: todayStr }
+            }
+        }, { transaction });
+
+        let totalHours = futureReservations.reduce((total, reservation) => {
+            const start = moment(reservation.date + 'T' + reservation.startTime); // 날짜와 시간을 결합하여 moment 객체 생성
+            const end = moment(reservation.date + 'T' + reservation.endTime); // 날짜와 시간을 결합하여 moment 객체 생성
+
+            if (start.isSameOrAfter(now) || (start.isSame(now, 'day') && end.isAfter(now))) {
+                const durationHours = end.diff(start, 'hours', true); // moment를 사용하여 시간의 차이를 계산
+                return total + durationHours;
+            }
+            return total;
+        }, 0);
+
+        await transaction.commit();
+        return res.json({ success: true, value: 30-totalHours });
+    }
+    catch (error){
+        await transaction.rollback();
+        console.log(error)
     }
 }
 
@@ -161,8 +226,10 @@ exports.resDate = async (req, res) => {
             case '소회의실2':
                 roomValue = 'meetRoom2';
                 break;
+            case '전체회의실':
+                roomValue = 'whole';
+                break;
         }
-
 
 
         if (!date || !roomValue) {
@@ -170,9 +237,14 @@ exports.resDate = async (req, res) => {
             return;
         }
 
-        const reservations
-            = await Reserve.findAll({
-            where: {date: date, roomValue: roomValue} });
+        let whereCondition = { date: date };
+        if (roomValue !== 'whole') {
+            whereCondition.roomValue = roomValue;
+        }
+
+        const reservations = await Reserve.findAll({
+            where: whereCondition
+        });
 
         // 예약 없으면 빈 문자열 전송
         if (reservations.length === 0) {
@@ -180,7 +252,6 @@ exports.resDate = async (req, res) => {
         } else {
             const timesArray = []
             reservations.forEach(reservation => {
-                // Assuming each reservation has startTime and endTime
                 const slots = generateTimeSlots(reservation.startTime, reservation.endTime);
                 timesArray.push(...slots);
             });
@@ -299,15 +370,18 @@ exports.deleteRes = async (req, res) => {
     if(!resId){
         return res.status(400).send('필요한 쿼리 파라미터가 누락되었습니다.');
     }
+    let transaction
 
     try {
+        transaction = await sequelize.transaction();
         const reserves = await Reserve.findAll({
             where: {
                 id: resId
             }
-        });
+        }, { transaction });
 
         if (reserves.length === 0) {
+            await transaction.commit();
             return res.status(200).json([]); // 배열의 길이가 0이면 빈 배열을 반환합니다.
         }
 
@@ -315,14 +389,17 @@ exports.deleteRes = async (req, res) => {
             where: {
                 id: resId
             }
-        });
+        }, { transaction });
         await Booked.update(
             { cancel: 'cancel' },  // 변경할 속성
-            { where: { ReserveId: resId } }  // 수정할 레코드를 찾는 조건
+            { where: { ReserveId: resId } },  // 수정할 레코드를 찾는 조건
+            { transaction }
         );
 
+        await transaction.commit();
         res.status(200).json({ message: true });
     } catch (error) {
+        if (transaction) await transaction.rollback();
         res.status(500).json({ message: `Error: ${error}` });  // 에러가 발생하면 500 에러와 함께 에러 메시지를 반환합니다.
     }
 }

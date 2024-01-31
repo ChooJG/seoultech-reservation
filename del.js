@@ -2,13 +2,13 @@ const Sequelize = require('sequelize');
 const { User, Reserve, Booked } = require('./models'); // 'models'는 실제 모델이 위치한 경로로 변경해주세요.
 
 
-Booked.findAll()
-    .then(users => {
-        console.log(users);
-    })
-    .catch(error => {
-        console.log("데이터를 불러오는데 실패했습니다: ", error);
-    });
+// Booked.findAll()
+//     .then(users => {
+//         console.log(users);
+//     })
+//     .catch(error => {
+//         console.log("데이터를 불러오는데 실패했습니다: ", error);
+//     });
 
 
 // User.destroy({
@@ -35,18 +35,18 @@ Booked.findAll()
 //         console.log("데이터를 추가하는데 실패했습니다: ", error);
 //     });
 
-//console.log(Object.keys(Booked.rawAttributes));
+console.log(Object.keys(Reserve.rawAttributes));
 
 // const recreateTable = async () => {
 //     try {
 //         // 테이블을 삭제합니다.
 //         await Booked.drop();
 //         await Reserve.drop();
-//         await User.drop();
+//         //await User.drop();
 //         console.log("테이블이 성공적으로 삭제되었습니다.");
 //
 //         // 테이블을 다시 생성합니다.
-//         await User.sync();
+//         //await User.sync();
 //         await Reserve.sync();
 //         await Booked.sync();
 //         console.log("테이블이 성공적으로 생성되었습니다.");
