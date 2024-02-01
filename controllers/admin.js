@@ -306,6 +306,7 @@ exports.infoWatch = async (req, res) => {
 exports.getBookings = async (req, res) => {
     const room = req.body.room;
     const date = req.body.date;
+    const offset = req.body.offset || 0; // offset 값 가져오기
 
     let condition = {}; // where 조건을 담을 객체 생성
     let limit; // 가져올 결과의 개수를 담을 변수 생성
@@ -322,7 +323,8 @@ exports.getBookings = async (req, res) => {
         const adminResList = await Booked.findAll({
             where: condition, // 위에서 만든 조건 객체 사용
             order: [['date', 'DESC'], ['startTime', 'DESC']],
-            limit // 위에서 설정한 limit 사용
+            limit, // 위에서 설정한 limit 사용
+            offset // offset 옵션 설정
         });
 
         const userResArrSet = adminResList.map(item => {
@@ -342,6 +344,7 @@ exports.getBookings = async (req, res) => {
         console.log(error);
     }
 }
+
 
 exports.downloadBookings = async (req, res) => {
     const room = req.body.room;
@@ -368,7 +371,7 @@ exports.downloadBookings = async (req, res) => {
                 날짜: item.date,
                 시작시간: item.startTime,
                 종료시간: item.endTime,
-                취소여부: item.cancel,
+                취소여부: item.cancel === 'cancel' ? '취소' : item.cancel,
             };
         });
         // JSON 데이터를 Excel 워크시트로 변환

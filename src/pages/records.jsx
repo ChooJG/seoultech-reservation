@@ -109,9 +109,23 @@ const AdminPanel = () => {
                             <td>{item.start}</td>
                             <td>{item.end}</td>
                             <td>
-                                {item.cancel === 'cancel'
-                                    ? '취소'
-                                    : <button onClick={() => handleCancel(item.id)}>취소하기</button>
+                                {
+                                    (() => {
+                                        const dateObj = new Date(item.date + 'T00:00:00Z'); // item.date를 UTC 0시의 Date 객체로 변환
+                                        const today = new Date();
+                                        today.setHours(0, 0, 0, 0); // 시간, 분, 초, 밀리초를 0으로 설정
+
+                                        if (dateObj.getTime() < today.getTime()) {
+                                            if(item.cancel === 'cancel') {
+                                                return '취소';
+                                            }
+                                            return ''; // item.date가 오늘 이전의 날짜인 경우 공백 출력
+                                        } else if (item.cancel === 'cancel') {
+                                            return '취소';
+                                        } else {
+                                            return <button onClick={() => handleCancel(item.id)}>취소하기</button>;
+                                        }
+                                    })()
                                 }
                             </td>
                         </tr>
