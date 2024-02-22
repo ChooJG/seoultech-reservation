@@ -17,6 +17,17 @@ table {
     margin-top: 20px;
 }
 
+.tableMarginRecords {
+    overflow-x: auto;
+}
+
+/* 화면 크기가 600px 이하일 때의 스타일 */
+@media screen and (max-width: 600px) {
+    .tableMarginRecords {
+        padding-left: 300px; /* 왼쪽에 10px 패딩 추가 */
+    }
+}
+
 th, td {
     padding: 10px;
     text-align: center;
@@ -46,4 +57,15 @@ th {
     margin-top: 30px;
     border-radius: 5px;
     cursor: pointer;
+}
+
+html {
+    font-size: 18px; /* 원하는 크기로 설정 */
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    white-space: nowrap; /* 줄바꿈 방지 */
 }

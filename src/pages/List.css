@@ -1,5 +1,6 @@
 /* List.css */
 .list-container {
+    font-size: clamp(6px, 3vw, 18px);
     padding: 20px;
     max-width: 600px; /* 최대 너비 설정 */
     margin: 0 auto; /* 상하 마진은 0, 좌우 마진은 자동으로 설정하여 중앙 정렬 */
@@ -45,4 +46,13 @@
 /* 마우스 오버시 오버레이 효과 강화 */
 .meeting-room:hover .room-name {
     background: rgba(0, 0, 0, 0.7);
+}
+
+.notice {
+    font-size: clamp(6px, 3vw, 18px);
+}
+
+
+html {
+    font-size: 2vw; /* 화면 너비의 2% */
 }

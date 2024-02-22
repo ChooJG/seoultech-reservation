@@ -4,7 +4,6 @@
     width: 90%;
     margin: 0 auto;
     background-color: #fff;
-
 }
 
 h1 {
@@ -15,6 +14,16 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    overflow-x: auto;
+}
+.tableMargin {
+    overflow-x: auto;
+}
+
+@media screen and (max-width: 600px) {
+    .tableMargin {
+        padding-left: 300px; /* 왼쪽에 10px 패딩 추가 */
+    }
 }
 
 th, td {

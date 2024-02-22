@@ -1,7 +1,7 @@
 // AdminPanel.js
 
 import React, { useState, useEffect } from 'react';
-import './Admin.css';
+import './Bookings.css';
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 
@@ -21,19 +21,28 @@ const AdminPanel = () => {
 
 
     useEffect(() => {
+        let isMounted = true; // 컴포넌트 마운트 상태를 추적합니다.
+
         axios.get('http://localhost:3001/auth/isLogin'
             , { withCredentials: true }) // 서버의 로그인 상태 확인 엔드포인트
             .then(response => {
-                if (response.data.isAuthenticated && response.data.role === "admin") {
-                    setIsLoggedIn(true);
-                } else {
-                    navigate('/'); // 로그인 페이지로 리디렉션
+                if (isMounted) { // 컴포넌트가 마운트 상태인 경우에만 상태를 변경합니다.
+                    if (response.data.isAuthenticated && response.data.role === "admin") {
+                        setIsLoggedIn(true);
+                    } else {
+                        navigate('/'); // 로그인 페이지로 리디렉션
+                    }
                 }
             })
             .catch(error => {
-                //console.error('로그인 상태 확인 중 오류 발생:', error);
-                navigate('/'); // 오류 발생 시 로그인 페이지로 리디렉션
+                if (isMounted) {
+                    navigate('/'); // 오류 발생 시 로그인 페이지로 리디렉션
+                }
             });
+
+        return () => {
+            isMounted = false; // 컴포넌트가 언마운트될 때 isMounted를 false로 설정합니다.
+        };
     }, [navigate]);
 
     useEffect(() => {
@@ -198,6 +207,7 @@ const AdminPanel = () => {
                 </button>
             </div>
             {reservations.length > 0 ? (
+                <div className="tableMarginBooks">
                 <table>
                     <thead>
                     <tr>
@@ -242,10 +252,12 @@ const AdminPanel = () => {
                     ))}
                     </tbody>
                 </table>
+                </div>
             ) : (
                 <p>예약 내역이 없습니다</p>
             )}
             <button className="download-button" onClick={ () => backPage() }>뒤로가기</button>
+            <br/><br/><br/><br/><br/>
         </div>
     );
 };

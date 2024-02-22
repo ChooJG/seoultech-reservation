@@ -58,3 +58,7 @@
     background-color: #BBBBBB;
     color: white;
 }
+
+html {
+    font-size: 18px; /* 원하는 크기로 설정 */
+}

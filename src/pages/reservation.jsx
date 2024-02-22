@@ -26,8 +26,9 @@ function Reservation() {
   const [reservedSlots, setReservedSlots] = useState(['']);
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/auth/isLogin`,
-        { withCredentials: true })
+      const source = axios.CancelToken.source();
+      axios.get(`http://localhost:3001/auth/isLogin`,
+        { withCredentials: true, cancelToken: source.token })
         .then(response => {
           if (response.data.isAuthenticated) {
             setIsLoggedIn(true);
@@ -40,12 +41,20 @@ function Reservation() {
         })
         .catch(error => {
             //console.error('로그인 상태 확인 중 오류 발생:', error);
-          navigate(`/`);
+            if (axios.isCancel(error)) {
+                console.log('Request canceled', error.message);
+            } else {
+                navigate(`/`);
+            }
         });
+      return () => {
+          source.cancel('Operation canceled by the user.');
+      };
   }, [navigate, roomId]); // id가 변경될 때마다 로그인 상태를 재확인합니다
 
   //페이지 온로드 되는 순간 오늘 예약된 목록 보이기
   useEffect(() => {
+      const source = axios.CancelToken.source();
       const today = new Date();
       today.setHours(today.getHours() + 9); // UTC를 KST로 변환
       const formattedToday = today.toISOString().split('T')[0];
@@ -56,14 +65,21 @@ function Reservation() {
           date: formattedToday,
           roomName: roomName
         },
-        { withCredentials: true })
+        { withCredentials: true, cancelToken: source.token })
         .then(response => {
           const initialReservedTimes = response.data;
           setReservedSlots(initialReservedTimes);
         })
         .catch(error => {
-            //console.error('Error while sending date to server:', error);
+            if (axios.isCancel(error)) {
+                console.log('Request canceled', error.message);
+            } else {
+                //console.error('Error while sending date to server:', error);
+            }
         });
+      return () => {
+          source.cancel('Operation canceled by the user.');
+      };
   }, []);
 
 
@@ -239,14 +255,6 @@ function Reservation() {
     });
   };
 
-
-
-  const handleSlotSelect = (selectedSlot) => {
-    // Handle the selection of the time slot here
-      //console.log(`Selected time slot: ${selectedSlot}`);
-    // You can update the state or perform any other actions as needed
-  };
-
   return (
 
       <div className="reservation-container">
@@ -256,7 +264,7 @@ function Reservation() {
               {numberListItems}
           </div>
 
-        <TimeSlots times={times} reservedSlots={reservedSlots} startTime={startTime} endTime={endTime} onSelectSlot={handleSlotSelect} />
+        <TimeSlots times={times} reservedSlots={reservedSlots} startTime={startTime} endTime={endTime} />
         <label htmlFor="reservationDate" className="label">예약 날짜</label>
         <select id="reservationDate" value={selectedDate} onChange={handleDateChange}>
           {availableDates.map((date) => (
@@ -277,7 +285,7 @@ function Reservation() {
         <br />
         {renderReservationTime()}
         <button className="reservation-button" onClick={confirmReservation}>예약하기</button>
-
+          <br/><br/><br/><br/><br/>
       </div>
   );
 

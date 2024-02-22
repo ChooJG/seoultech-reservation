@@ -89,6 +89,7 @@ const AdminPanel = () => {
         <div className="container">
             <h1>관리자 페이지</h1>
             {reservations.length > 0 ? (
+                <div className= "tableMarginRecords">
                 <table>
                     <thead>
                     <tr>
@@ -132,10 +133,12 @@ const AdminPanel = () => {
                     ))}
                     </tbody>
                 </table>
+                </div>
             ) : (
                 <p>예약 내역이 없습니다</p>
             )}
             <button className="download-button" onClick={ () => handleAddUser() }>뒤로가기</button>
+            <br/><br/><br/><br/><br/>
         </div>
     );
 };

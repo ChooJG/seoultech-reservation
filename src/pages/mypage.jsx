@@ -13,18 +13,30 @@ function MyPage() {
 
     // 로그인 상태 확인
     useEffect(() => {
-        axios.get('http://localhost:3001/auth/isLogin', { withCredentials: true })
-            .then(response => {
-                if (response.data.isAuthenticated) {
-                    setIsLoggedIn(true);
-                } else {
+        let isMounted = true;
+        const checkLoginStatus = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/auth/isLogin', { withCredentials: true });
+
+                if (isMounted) {  // 컴포넌트가 마운트 상태인 경우에만 상태를 업데이트
+                    if (response.data.isAuthenticated) {
+                        setIsLoggedIn(true);
+                    } else {
+                        navigate('/');
+                    }
+                }
+            } catch (error) {
+                if (isMounted) {  // 컴포넌트가 마운트 상태인 경우에만 상태를 업데이트
                     navigate('/');
                 }
-            })
-            .catch(error => {
-                //console.error('로그인 상태 확인 중 오류 발생:', error);
-                navigate('/');
-            });
+            }
+        };
+
+        checkLoginStatus();
+
+        return () => {
+            isMounted = false;  // 컴포넌트가 언마운트되면 isMounted를 false로 설정
+        };
     }, [navigate]);
 
     // 예약 데이터 가져오기 함수

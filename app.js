@@ -27,13 +27,7 @@ nunjucks.configure('views', {
   express: app,
   watch: true,
 });
-// sequelize.sync({ force: false })
-//     .then(() => {
-//       console.log("데이터베이스 연결 성공");
-//     })
-//     .catch((err) => {
-//       console.error(err);
-//     });
+
 
 sequelize
     .sync({ force: false })
@@ -55,12 +49,12 @@ else{
   app.use(morgan('dev'));
 }
 
-var cors = require('cors');
-app.use(cors({
-  origin: 'http://localhost:3000', // 클라이언트의 주소
-  credentials: true
-}));
-//app.use(express.static(path.join(__dirname, './build')));
+// var cors = require('cors');
+// app.use(cors({
+//   origin: 'http://localhost:3000', // 클라이언트의 주소
+//   credentials: true
+// }));
+app.use(express.static(path.join(__dirname, './build')));
 
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -90,9 +84,9 @@ app.use('/', pageRouter);
 app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
 
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, './build', 'index.html'));
-// });
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, './build', 'index.html'));
+});
 
 app.use((req, res, next)=> {
   const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
@@ -106,6 +100,11 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.render('error')
 });
+
+setInterval(() => {
+  const { rss, heapTotal, heapUsed, external } = process.memoryUsage();
+  console.log(`RSS: ${rss}, Heap Total: ${heapTotal}, Heap Used: ${heapUsed}, External: ${external}`);
+}, 1000);
 
 app.listen(app.get('port'), () => {
   console.log(app.get('port'), '번 포트에서 대기 중');

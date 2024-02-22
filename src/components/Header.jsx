@@ -53,8 +53,7 @@ function Header() {
     return (
         <header className="header">
             <div onClick={redirectToHome} className="header-content">
-                <img src="/Seoultech_LOGO.png" alt="Seoultech Logo" className="header-logo" />
-                <div className="header-title"><b>창업보육센터</b></div>
+                <img src="/seoulTech_new_Logo.png" alt="Seoultech Logo" className="header-logo" />
             </div>
             <button className="menu-button" onClick={toggleMenu}>
                 {/* 메뉴 버튼 아이콘입니다. 실제 아이콘으로 교체해주세요. */}

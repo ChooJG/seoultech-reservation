@@ -28,55 +28,81 @@ const AdminPanel = () => {
     }, [navigate]);
 
     useEffect(() => {
-        axios.get('http://localhost:3001/admin/showUsers',
-            { withCredentials: true })
-            .then(response => {
-                setUsers(response.data);
-            })
-            .catch(error => {
+        let isMounted = true;   // 컴포넌트 마운트 상태를 나타내는 변수
+
+        const fetchUsers = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/admin/showUsers', { withCredentials: true });
+
+                if (isMounted) {  // 컴포넌트가 마운트 상태인 경우에만 상태를 업데이트
+                    setUsers(response.data);
+                }
+            } catch (error) {
                 //console.error('Error fetching users:', error);
-            });
+            }
+        };
+
+        fetchUsers();
+
+        return () => {
+            isMounted = false;  // 컴포넌트가 언마운트되면 isMounted를 false로 설정
+        };
     }, []);
 
 
     if (!isLoggedIn) {
-        return <div>now loading...</div>; // 로그인 확인 중 표시
+        return <div>now loading...</div>;
     }
 
     const handleIdChange = (id, newCompanyName) => {
         // 회사명 및 패스워드 변경 로직
-
         if (!newCompanyName) {
             alert("새로운 회사명을 입력하세요");
             return;
         }
 
+        const CancelToken = axios.CancelToken;
+        const source = CancelToken.source();
+
         axios.post('http://localhost:3001/admin/updateUser',
             { newCompanyName, id },
-            { withCredentials: true })
+            { withCredentials: true, cancelToken: source.token })
             .then(response => {
                 if (response.status === 409) {
                     alert("이미 존재하는 회사명입니다.")
                 }
             })
             .catch(error => {
-                if (error.response.status === 409) {
-                    alert("이미 존재하는 회사명입니다.");
-                    return;
+                if (axios.isCancel(error)) {
+                    console.log('Request canceled', error.message);
+                } else {
+                    if (error.response.status === 409) {
+                        alert("이미 존재하는 회사명입니다.");
+                        return;
+                    }
+                    //console.error('Error fetching users:', error);
                 }
-                //console.error('Error fetching users:', error);
             })
             .finally(() => {
                 axios.get('http://localhost:3001/admin/showUsers',
-                    { withCredentials: true })
+                    { withCredentials: true, cancelToken: source.token })
                     .then(response => {
                         setUsers(response.data);
                     })
                     .catch(error => {
-                        //console.error('Error fetching users:', error);
+                        if (axios.isCancel(error)) {
+                            console.log('Request canceled', error.message);
+                        } else {
+                            //console.error('Error fetching users:', error);
+                        }
                     });
             });
+
+        return () => {
+            source.cancel('Operation canceled by the user.');
+        }
     };
+
 
     const handlePwChange = (id, newCompanyPw) => {
         if (!newCompanyPw || newCompanyPw === "") {
@@ -84,29 +110,46 @@ const AdminPanel = () => {
             return;
         }
 
+        const CancelToken = axios.CancelToken;
+        const source = CancelToken.source();
+
         axios.post('http://localhost:3001/admin/updateUserPw',
             { newCompanyPw, id },
-            { withCredentials: true })
+            { withCredentials: true, cancelToken: source.token })
             .then(response => {
             })
             .catch(error => {
+                if (axios.isCancel(error)) {
+                    console.log('Request canceled', error.message);
+                } else {
+                    // handle other errors
+                }
             })
             .finally(() => {
                 axios.get('http://localhost:3001/admin/showUsers',
-                    { withCredentials: true })
+                    { withCredentials: true, cancelToken: source.token })
                     .then(response => {
                         setUsers(response.data);
                     })
                     .catch(error => {
-                        //console.error('Error fetching users:', error);
+                        if (axios.isCancel(error)) {
+                            console.log('Request canceled', error.message);
+                        } else {
+                            //console.error('Error fetching users:', error);
+                        }
                     });
             });
     }
 
+
+
     const handleDelete = (id) => {
+        const CancelToken = axios.CancelToken;
+        const source = CancelToken.source();
+
         axios.post('http://localhost:3001/admin/deleteUser',
             { id },
-            { withCredentials: true })
+            { withCredentials: true, cancelToken: source.token })
             .then(response => {
                 if(response.status === 409){
                     alert("하나 이상의 관리자 계정이 존재해야 합니다.");
@@ -114,25 +157,35 @@ const AdminPanel = () => {
                 else {
                     alert("유저가 삭제되었습니다.");
                 }
+            })
+            .catch(error => {
+                if (axios.isCancel(error)) {
+                    console.log('Request canceled', error.message);
+                } else {
+                    if(error.response.status === 409){
+                        alert("하나 이상의 관리자 계정이 존재해야 합니다.");
+                    }
+                    else {
+                        alert("서버에서 오류가 발생하였습니다. 잠시 후 다시 시도해주세요.");
+                    }
+                }
+            })
+            .finally(() => {
                 axios.get('http://localhost:3001/admin/showUsers',
-                    { withCredentials: true })
+                    { withCredentials: true, cancelToken: source.token })
                     .then(response => {
                         setUsers(response.data);
                     })
                     .catch(error => {
-                        //console.error('Error fetching users:', error);
+                        if (axios.isCancel(error)) {
+                            console.log('Request canceled', error.message);
+                        } else {
+                            //console.error('Error fetching users:', error);
+                        }
                     });
-            })
-            .catch(error => {
-                if(error.response.status === 409){
-                    alert("하나 이상의 관리자 계정이 존재해야 합니다.");
-                }
-                else {
-                    alert("서버에서 오류가 발생하였습니다. 잠시 후 다시 시도해주세요.");
-                }
-                //console.error('Error fetching users:', error);
             });
     }
+
 
     const handleRecords = () => {
         navigate('/bookings');
@@ -140,8 +193,8 @@ const AdminPanel = () => {
 
     const handleAddUser = () => {
 
-        const newUser = prompt("새로운 회사 명을 입력하세요");
-        const newUserPw = prompt("새로운 비밀번호를 입력하세요");
+        const newUser = prompt("새로운 회사 명을 입력하세요 (최대 20자)");
+        const newUserPw = prompt("새로운 비밀번호를 입력하세요 (최대 20자)");
 
         if (!newUser || !newUserPw){
             alert("새로운 회사 명과 비밀번호를 입력해 주세요");
@@ -226,6 +279,7 @@ const AdminPanel = () => {
     return (
         <div className="container">
             <h1>관리자 페이지</h1>
+            <div className="tableMargin">
             <table>
                 <thead>
                 <tr>
@@ -271,10 +325,12 @@ const AdminPanel = () => {
                 ))}
                 </tbody>
             </table>
+            </div>
             <button className="download-button"
             onClick={ () => handleAddUser() }>유저 추가</button>
             <button className="download-button"
                     onClick={ () => handleRecords() }>전체 활동 내역</button>
+            <br/><br/><br/><br/><br/>
         </div>
     );
 };
